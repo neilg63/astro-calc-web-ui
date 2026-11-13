@@ -38,7 +38,7 @@ function submit() {
   <h1 class="view-title title">Positions</h1>
   <p class="view-subtitle subtitle">Several bodies at one moment.</p>
 
-  <div class="view-form box">
+  <div class="view-form box horizontal-form">
     <BodySelect v-model="bodies.keys" />
     <MomentFields :form="moment" />
     <ViewFields :form="view" />

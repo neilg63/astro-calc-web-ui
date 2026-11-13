@@ -71,7 +71,7 @@ function submit() {
   <h1 class="view-title title">Progress</h1>
   <p class="view-subtitle subtitle">A series of positions over time, or a secondary-progression series (one day per year).</p>
 
-  <div class="view-form box">
+  <div class="view-form box horizontal-form">
     <BodySelect v-model="bodies.keys" />
     <MomentFields :form="moment" label="Start" />
     <ViewFields :form="view" />

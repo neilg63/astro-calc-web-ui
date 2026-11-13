@@ -16,7 +16,7 @@ const selected = computed({
 
 <template>
   <b-field class="body-select" :label="label ?? 'Bodies'" label-position="on-border">
-    <b-select multiple expanded native-size="8" v-model="selected">
+    <b-select multiple expanded native-size="8" v-model="selected" size="is-small">
       <option v-for="b in reference.bodies" :key="b.key" :value="b.key" :disabled="!b.available">
         {{ b.name }} ({{ b.key }}){{ b.available ? '' : ' — unavailable' }}
       </option>

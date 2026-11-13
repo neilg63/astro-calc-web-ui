@@ -40,7 +40,7 @@ function submit() {
   <h1 class="view-title title">Stations</h1>
   <p class="view-subtitle subtitle">Each body's current speed and its retrograde/direct stations.</p>
 
-  <div class="view-form box">
+  <div class="view-form box horizontal-form">
     <BodySelect v-model="bodies.keys" />
     <MomentFields :form="moment" />
     <RangeEndFields :form="rangeEnd" />

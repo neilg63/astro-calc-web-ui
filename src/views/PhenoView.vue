@@ -30,7 +30,7 @@ function submit() {
   <h1 class="view-title title">Phenomena</h1>
   <p class="view-subtitle subtitle">Phase, elongation, apparent diameter and magnitude of each body.</p>
 
-  <div class="view-form box">
+  <div class="view-form box horizontal-form">
     <BodySelect v-model="bodies.keys" />
     <MomentFields :form="moment" />
     <b-button type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>

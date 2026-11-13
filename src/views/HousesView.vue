@@ -31,7 +31,7 @@ function submit() {
 <template>
   <section class="view-page view-houses">
   <h1 class="view-title title">Houses</h1>
-  <div class="view-form box">
+  <div class="view-form box horizontal-form">
     <MomentFields :form="moment" />
     <LocationFields />
     <HouseSystemSelect v-model="systems.codes" />

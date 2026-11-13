@@ -31,7 +31,7 @@ function submit() {
 <template>
   <section class="view-page view-rise-set">
   <h1 class="view-title title">Rise / Set</h1>
-  <div class="view-form box">
+  <div class="view-form box horizontal-form">
     <BodySelect v-model="bodies.keys" />
     <MomentFields :form="moment" />
     <LocationFields />

@@ -40,7 +40,7 @@ function submit() {
   <h1 class="view-title title">Position</h1>
   <p class="view-subtitle subtitle">One body's ecliptic, equatorial or horizontal position.</p>
 
-  <div class="view-form box">
+  <div class="view-form box horizontal-form">
     <b-field label="Body" label-position="on-border">
       <b-select v-model="body.key">
         <option v-for="b in reference.bodies" :key="b.key" :value="b.key" :disabled="!b.available">{{ b.name }} ({{ b.key }})</option>

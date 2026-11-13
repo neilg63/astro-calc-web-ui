@@ -40,7 +40,7 @@ function submit() {
 <template>
   <section class="view-page view-moon-phases">
   <h1 class="view-title title">Moon Phases</h1>
-  <div class="view-form box">
+  <div class="view-form box horizontal-form">
     <MomentFields :form="moment" />
     <RangeEndFields :form="rangeEnd" />
     <b-field grouped group-multiline>

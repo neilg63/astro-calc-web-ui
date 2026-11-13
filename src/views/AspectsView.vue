@@ -44,7 +44,7 @@ function submit() {
   <h1 class="view-title title">Aspects</h1>
   <p class="view-subtitle subtitle">Every aspect between the selected bodies, by ecliptic longitude.</p>
 
-  <div class="view-form box">
+  <div class="view-form box horizontal-form">
     <BodySelect v-model="bodies.keys" />
     <MomentFields :form="moment" />
     <b-field label="Perspective" label-position="on-border">

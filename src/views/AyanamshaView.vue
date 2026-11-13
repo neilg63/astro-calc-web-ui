@@ -29,7 +29,7 @@ function submit() {
 <template>
   <section class="view-page view-ayanamsha">
   <h1 class="view-title title">Ayanamsha</h1>
-  <div class="view-form box">
+  <div class="view-form box horizontal-form">
     <MomentFields :form="moment" />
     <b-field label="Ayanamshas (none = all)" label-position="on-border">
       <b-select multiple expanded native-size="6" v-model="selection.keys">

@@ -5,14 +5,14 @@ defineProps<{ form: MomentForm; label?: string }>()
 </script>
 
 <template>
-  <b-field class="moment-fields" :label="label ?? 'Moment'" grouped group-multiline>
-    <b-field>
-      <b-select v-model="form.mode">
+  <b-field class="moment-fields"  size="is-small" :label="label ?? 'Moment'" grouped group-multiline>
+
+      <b-select v-model="form.mode" size="is-small">
         <option value="now">Now</option>
         <option value="dt">Date / time</option>
         <option value="jd">Julian Day</option>
       </b-select>
-    </b-field>
+    
     <template v-if="form.mode === 'dt'">
       <b-field label="Local date-time" label-position="on-border">
         <b-input v-model="form.dt" type="datetime-local" step="1" />

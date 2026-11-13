@@ -68,7 +68,7 @@ function submit() {
   <h1 class="view-title title">Indian Day</h1>
   <p class="view-subtitle subtitle">The sunrise-to-sunrise day containing the date, with ghati/vighati time units.</p>
 
-  <div class="view-form box">
+  <div class="view-form box horizontal-form">
     <MomentFields :form="moment" />
     <LocationFields />
     <b-button type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>

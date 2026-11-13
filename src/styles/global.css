@@ -36,6 +36,7 @@
   --acw-surface-hover: #232323;
   --acw-border: #2c2c2c;
   --acw-text-muted: #aaa;
+  --acw-accent-2: #d1990b;
 }
 
 /* ---- App shell ---- */
@@ -170,4 +171,73 @@
   gap: 0.5rem;
   align-items: center;
   margin-bottom: 0.4rem;
+}
+
+#app .home-tile-grid > a  {
+  color: white;
+}
+
+#app .home-tile-grid > a:hover  {
+  color: yellow;
+}
+
+
+#app .home-title {
+  font-size: 1em;
+  color: var(--acw-accent);
+}
+#app .view-page .subtitle,
+#app .view-home .subtitle {
+  font-size: 0.8em;
+}
+
+#app .view-page h1 {
+  font-size: 1em;
+  color: var(--acw-accent-2);
+}
+
+#app .horizontal-form {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: flex-end;
+}
+
+#app .horizontal-form .button.is-primary {
+  height: 1.75em;
+  margin-bottom: 0.75em;
+  margin-left: 0.5em;
+}
+
+#app .horizontal-form > .field > label {
+  font-size: 0.75em;
+  font-weight: normal;
+  color: var(--acw-accent-2);
+}
+
+#app .horizontal-form > .field .field,
+#app .horizontal-form > .field {
+  position: relative;
+}
+
+#app .horizontal-form > .field {
+  margin-right: 0.5em;
+}
+
+#app .horizontal-form > .field .field > label {
+  font-size: 0.625em;
+  font-weight: normal;
+  color: var(--acw-border);
+  pointer-events: none;
+  opacity: 0.75;
+  text-align: left;
+  position: absolute;
+  left: -2.75em;
+  display: block;
+  padding:0;
+  top: -1.375em;
+  font-style: italic;
+}
+
+#app .horizontal-form .body-select select {
+  max-height: 4em;
 }

@@ -12,7 +12,7 @@ const navOpen = ref(false)
       <a role="button" class="app-navbar-burger navbar-burger" :class="{ 'is-active': navOpen }" aria-label="menu" @click="navOpen = !navOpen">
         <span /><span /><span />
       </a>
-      <RouterLink class="app-navbar-title navbar-item" to="/" @click="navOpen = false"><strong>astro-calc-web-ui</strong></RouterLink>
+      <RouterLink class="app-navbar-title navbar-item" to="/" @click="navOpen = false"><strong>AstroCalc Demo</strong></RouterLink>
     </div>
     <div class="app-nav-menu" v-show="navOpen" @click="navOpen = false">
       <RouterLink v-for="l in ALL_LINKS" :key="l.to" class="app-nav-menu-item" :to="l.to">

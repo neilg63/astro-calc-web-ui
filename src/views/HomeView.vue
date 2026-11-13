@@ -13,7 +13,7 @@ onMounted(() => run({}))
 
 <template>
   <section class="view-page view-home">
-    <h1 class="view-title title">astro-calc-web-ui</h1>
+    <h1 class="view-title title home-title">Home</h1>
     <p class="view-subtitle subtitle">A browser front end for every astro-calc-api endpoint.</p>
 
     <div class="home-tile-grid mt-4">
