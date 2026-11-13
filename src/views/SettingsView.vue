@@ -22,33 +22,61 @@ function resetPreferences() {
   <h1 class="title">Settings</h1>
   <p class="subtitle">Preferences are saved to this browser's local storage.</p>
 
-  <div class="box">
-    <b-field label="API base URL" label-position="on-border">
-      <b-input v-model="apiBase" placeholder="https://astrocalc.multifaceted.info" />
-    </b-field>
-    <b-field label="Default UTC offset (hours)" label-position="on-border">
-      <b-numberinput v-model="tzOffsetHours" :step="0.5" :min="-14" :max="14" :controls="false" />
-    </b-field>
-    <b-field label="Default coordinate system" label-position="on-border">
-      <b-select v-model="cs">
-        <option value="ecl">Ecliptic</option>
-        <option value="equ">Equatorial</option>
-        <option value="hor">Horizontal</option>
-      </b-select>
-    </b-field>
-    <b-field label="Default perspective" label-position="on-border">
-      <b-select v-model="ps">
-        <option value="geo">Geocentric</option>
-        <option value="topo">Topocentric</option>
-      </b-select>
-    </b-field>
-    <b-field label="Default orb (degrees)" label-position="on-border">
-      <b-numberinput v-model="defaultOrb" :step="0.5" :min="0.1" :controls="false" />
-    </b-field>
-    <b-field grouped>
-      <b-button @click="reload" :loading="referenceLoading">Reload reference data</b-button>
-      <b-button type="is-danger" outlined @click="resetPreferences">Reset preferences</b-button>
-    </b-field>
+  <div class="box settings-box">
+    <div class="columns is-multiline">
+      <div class="column is-full">
+        <b-field horizontal label="API base URL">
+          <b-input v-model="apiBase" placeholder="https://astrocalc.multifaceted.info" size="is-small" />
+        </b-field>
+      </div>
+      <div class="column is-half">
+        <b-field horizontal label="UTC offset (h)">
+          <b-numberinput v-model="tzOffsetHours" :step="0.5" :min="-14" :max="14" :controls="false" size="is-small" />
+        </b-field>
+      </div>
+      <div class="column is-half">
+        <b-field horizontal label="Default orb (°)">
+          <b-numberinput v-model="defaultOrb" :step="0.5" :min="0.1" :controls="false" size="is-small" />
+        </b-field>
+      </div>
+      <div class="column is-half">
+        <b-field horizontal label="Coord. system">
+          <b-select v-model="cs" size="is-small" expanded>
+            <option value="ecl">Ecliptic</option>
+            <option value="equ">Equatorial</option>
+            <option value="hor">Horizontal</option>
+          </b-select>
+        </b-field>
+      </div>
+      <div class="column is-half">
+        <b-field horizontal label="Perspective">
+          <b-select v-model="ps" size="is-small" expanded>
+            <option value="geo">Geocentric</option>
+            <option value="topo">Topocentric</option>
+          </b-select>
+        </b-field>
+      </div>
+    </div>
+
+    <div class="buttons mt-2">
+      <b-button @click="reload" :loading="referenceLoading" size="is-small">Reload reference data</b-button>
+      <b-button type="is-danger" outlined @click="resetPreferences" size="is-small">Reset preferences</b-button>
+    </div>
     <b-notification v-if="referenceError" type="is-danger" :closable="false">{{ referenceError }}</b-notification>
   </div>
 </template>
+
+<style scoped>
+.settings-box :deep(.field.is-horizontal) {
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+.settings-box :deep(.field-label) {
+  flex-grow: 1;
+  text-align: left;
+  font-weight: 500;
+}
+.settings-box :deep(.field-label .label) {
+  font-size: 0.85rem;
+}
+</style>
