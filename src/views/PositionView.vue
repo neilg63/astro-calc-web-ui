@@ -7,6 +7,7 @@ import MomentFields from '../components/MomentFields.vue'
 import ViewFields from '../components/ViewFields.vue'
 import AyanamshaFields, { type AyanamshaFormValue } from '../components/AyanamshaFields.vue'
 import ResultPanel from '../components/ResultPanel.vue'
+import DegreeValue from '../components/DegreeValue.vue'
 import { round } from '../lib/format'
 import type { AyanamshaValue, BodyPosition, GeoJson } from '../api/types'
 
@@ -56,7 +57,7 @@ function submit() {
     <template #default="{ data: res }">
       <b-table :data="[(res as PositionResult).body]" striped narrowed>
         <b-table-column field="key" label="Body" v-slot="props">{{ props.row.key }}</b-table-column>
-        <b-table-column field="lng" label="Longitude" v-slot="props">{{ round(props.row.lng) }}</b-table-column>
+        <b-table-column field="lng" label="Longitude" v-slot="props"><DegreeValue :value="props.row.lng" /></b-table-column>
         <b-table-column field="lat" label="Latitude" v-slot="props">{{ round(props.row.lat) }}</b-table-column>
         <b-table-column field="lng_speed" label="Lng speed" v-slot="props">{{ round(props.row.lng_speed) }}</b-table-column>
         <b-table-column field="lat_speed" label="Lat speed" v-slot="props">{{ round(props.row.lat_speed) }}</b-table-column>

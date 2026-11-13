@@ -5,8 +5,8 @@ import { momentParams, useMomentForm } from '../lib/queryForms'
 import MomentFields from '../components/MomentFields.vue'
 import LocationFields from '../components/LocationFields.vue'
 import ResultPanel from '../components/ResultPanel.vue'
+import DegreeValue from '../components/DegreeValue.vue'
 import { usePreferencesStore } from '../stores/preferences'
-import { round } from '../lib/format'
 import type { Angles, GeoJson } from '../api/types'
 
 const moment = useMomentForm()
@@ -44,7 +44,7 @@ function submit() {
     <template #default>
       <b-table :data="rows" striped narrowed>
         <b-table-column field="key" label="Angle" v-slot="props">{{ props.row.key }}</b-table-column>
-        <b-table-column field="value" label="Degrees" v-slot="props">{{ round(props.row.value) }}</b-table-column>
+        <b-table-column field="value" label="Degrees" v-slot="props"><DegreeValue :value="props.row.value" /></b-table-column>
       </b-table>
     </template>
   </ResultPanel>

@@ -4,8 +4,8 @@ import { momentParams, useMomentForm } from '../lib/queryForms'
 import MomentFields from '../components/MomentFields.vue'
 import LocationFields from '../components/LocationFields.vue'
 import ResultPanel from '../components/ResultPanel.vue'
+import DegreeValue from '../components/DegreeValue.vue'
 import { usePreferencesStore } from '../stores/preferences'
-import { round } from '../lib/format'
 import type { GeoJson } from '../api/types'
 
 const moment = useMomentForm()
@@ -35,7 +35,7 @@ function submit() {
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">
     <template #default="{ data: res }">
-      <p class="title is-4">{{ round((res as AscendantResult).ascendant, 4) }}°</p>
+      <p class="title is-4"><DegreeValue :value="(res as AscendantResult).ascendant" /></p>
     </template>
   </ResultPanel>
   </section>

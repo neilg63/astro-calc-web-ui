@@ -27,6 +27,10 @@
  *                   .range-end-fields, .aspect-orbs-editor, .aspect-orbs-row,
  *                   .aspect-orbs-angle, .aspect-orbs-orb, .aspect-orbs-remove,
  *                   .aspect-orbs-add
+ *   Degree display  .degree-value (+ .degree-value-sign/-dms/-decimal for
+ *                   the active mode) — the DegreeValue.vue component used
+ *                   for ecliptic-longitude-like table cells; hover/focus
+ *                   for the other two formats.
  */
 
 :root {
@@ -162,6 +166,14 @@
   max-height: 24rem;
   overflow: auto;
   font-size: 0.8rem;
+}
+
+/* ---- Degree display ---- */
+
+.degree-value {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  cursor: help;
 }
 
 /* ---- Aspect orb editor ---- */
