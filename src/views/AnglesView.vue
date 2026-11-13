@@ -32,11 +32,12 @@ function submit() {
 </script>
 
 <template>
-  <h1 class="title">Angles</h1>
-  <div class="box">
+  <section class="view-page view-angles">
+  <h1 class="view-title title">Angles</h1>
+  <div class="view-form box">
     <MomentFields :form="moment" />
     <LocationFields />
-    <b-button type="is-primary" @click="submit" :loading="loading">Run</b-button>
+    <b-button type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
   </div>
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">
@@ -47,4 +48,5 @@ function submit() {
       </b-table>
     </template>
   </ResultPanel>
+  </section>
 </template>

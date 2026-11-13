@@ -5,7 +5,7 @@ defineProps<{ form: RangeEndForm; label?: string }>()
 </script>
 
 <template>
-  <b-field :label="label ?? 'Range end'" grouped group-multiline>
+  <b-field class="range-end-fields" :label="label ?? 'Range end'" grouped group-multiline>
     <b-field>
       <b-select v-model="form.mode">
         <option value="none">Open-ended (use count)</option>

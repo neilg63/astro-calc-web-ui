@@ -36,10 +36,11 @@ function submit() {
 </script>
 
 <template>
-  <h1 class="title">Stations</h1>
-  <p class="subtitle">Each body's current speed and its retrograde/direct stations.</p>
+  <section class="view-page view-stations">
+  <h1 class="view-title title">Stations</h1>
+  <p class="view-subtitle subtitle">Each body's current speed and its retrograde/direct stations.</p>
 
-  <div class="box">
+  <div class="view-form box">
     <BodySelect v-model="bodies.keys" />
     <MomentFields :form="moment" />
     <RangeEndFields :form="rangeEnd" />
@@ -51,7 +52,7 @@ function submit() {
         <b-numberinput v-model="opts.before" :min="0" :controls="false" />
       </b-field>
     </b-field>
-    <b-button type="is-primary" @click="submit" :loading="loading">Run</b-button>
+    <b-button type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
   </div>
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">
@@ -66,4 +67,5 @@ function submit() {
       </b-table>
     </template>
   </ResultPanel>
+  </section>
 </template>

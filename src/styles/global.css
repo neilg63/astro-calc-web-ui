@@ -1,0 +1,173 @@
+/*
+ * Global stylesheet for astro-calc-web-ui.
+ *
+ * This is the one place app-specific visual rules live (everything else
+ * comes from Bulma/Buefy). It is imported last in src/main.ts, after
+ * bulma.css, buefy.css and the MDI icon font, so a selector of equal
+ * specificity here wins. None of the component .vue files use <style
+ * scoped> for anything structural any more — they only carry semantic
+ * class names (view-title, view-form, result-panel, home-tile, ...) so
+ * you can restyle the whole app by editing this file, or by importing
+ * your own stylesheet after this one in main.ts.
+ *
+ * Class name map, by area:
+ *   App shell      .app-navbar, .app-navbar-brand, .app-navbar-burger,
+ *                   .app-navbar-title, .app-nav-menu, .app-nav-menu-item,
+ *                   .app-nav-backdrop, .app-main
+ *   Every view      .view-page, .view-<route> (e.g. .view-positions),
+ *                   .view-title, .view-subtitle, .view-form, .run-button
+ *   Home            .home-tile-grid, .home-tile, .home-tile-icon,
+ *                   .home-tile-label, .home-tile-blurb, .home-info-box
+ *   Settings        .settings-form, .settings-actions
+ *   Results         .result-panel, .result-panel-error, .result-panel-loading,
+ *                   .result-panel-url, .result-panel-body,
+ *                   .result-panel-raw-toggle, .result-panel-raw
+ *   Form components .moment-fields, .location-fields, .view-fields,
+ *                   .body-select, .ayanamsha-fields, .house-system-select,
+ *                   .range-end-fields, .aspect-orbs-editor, .aspect-orbs-row,
+ *                   .aspect-orbs-angle, .aspect-orbs-orb, .aspect-orbs-remove,
+ *                   .aspect-orbs-add
+ */
+
+:root {
+  --acw-accent: #3dd6b4;
+  --acw-bg: #121212;
+  --acw-surface: #1a1a1a;
+  --acw-surface-hover: #232323;
+  --acw-border: #2c2c2c;
+  --acw-text-muted: #aaa;
+}
+
+/* ---- App shell ---- */
+
+.app-navbar-burger {
+  display: flex !important;
+  margin-left: 0;
+}
+
+.app-nav-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 30;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 0.25rem;
+  width: min(32rem, 100vw);
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 0.75rem;
+  background: var(--acw-surface);
+  border-bottom: 1px solid var(--acw-border);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.4);
+}
+
+.app-nav-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: 4px;
+  color: #ddd;
+  font-size: 0.9rem;
+}
+
+.app-nav-menu-item:hover {
+  background: var(--acw-surface-hover);
+  color: #fff;
+}
+
+.app-nav-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+}
+
+/* ---- Home ---- */
+
+.home-tile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+  gap: 0.75rem;
+}
+
+.home-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.25rem;
+  padding: 1.25rem 0.5rem;
+  border-radius: 8px;
+  background: var(--acw-surface);
+  border: 1px solid var(--acw-border);
+  color: inherit;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.home-tile:hover {
+  background: var(--acw-surface-hover);
+  border-color: var(--acw-accent);
+}
+
+.home-tile-icon {
+  font-size: 2rem;
+  margin-bottom: 0.25rem;
+}
+
+.home-tile-label {
+  font-weight: 600;
+}
+
+.home-tile-blurb {
+  font-size: 0.75rem;
+  opacity: 0.65;
+}
+
+.home-info-box {
+  margin-top: 1rem;
+}
+
+/* ---- Every view page ---- */
+
+.view-form {
+  margin-bottom: 1rem;
+}
+
+.run-button {
+  margin-top: 0.25rem;
+}
+
+/* ---- Settings ---- */
+
+.settings-form .field.is-horizontal {
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.settings-form .field-label {
+  flex-grow: 1;
+  text-align: left;
+  font-weight: 500;
+}
+
+.settings-form .field-label .label {
+  font-size: 0.85rem;
+}
+
+/* ---- Results ---- */
+
+.result-panel-raw {
+  max-height: 24rem;
+  overflow: auto;
+  font-size: 0.8rem;
+}
+
+/* ---- Aspect orb editor ---- */
+
+.aspect-orbs-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.4rem;
+}

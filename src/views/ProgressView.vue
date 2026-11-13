@@ -67,10 +67,11 @@ function submit() {
 </script>
 
 <template>
-  <h1 class="title">Progress</h1>
-  <p class="subtitle">A series of positions over time, or a secondary-progression series (one day per year).</p>
+  <section class="view-page view-progress">
+  <h1 class="view-title title">Progress</h1>
+  <p class="view-subtitle subtitle">A series of positions over time, or a secondary-progression series (one day per year).</p>
 
-  <div class="box">
+  <div class="view-form box">
     <BodySelect v-model="bodies.keys" />
     <MomentFields :form="moment" label="Start" />
     <ViewFields :form="view" />
@@ -88,7 +89,7 @@ function submit() {
         <b-numberinput v-model="span.pd" :min="0.01" :step="0.5" :controls="false" />
       </b-field>
     </b-field>
-    <b-button type="is-primary" @click="submit" :loading="loading">Run</b-button>
+    <b-button type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
   </div>
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">
@@ -105,4 +106,5 @@ function submit() {
       </b-table>
     </template>
   </ResultPanel>
+  </section>
 </template>

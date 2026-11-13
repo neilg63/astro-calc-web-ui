@@ -26,13 +26,14 @@ function submit() {
 </script>
 
 <template>
-  <h1 class="title">Phenomena</h1>
-  <p class="subtitle">Phase, elongation, apparent diameter and magnitude of each body.</p>
+  <section class="view-page view-pheno">
+  <h1 class="view-title title">Phenomena</h1>
+  <p class="view-subtitle subtitle">Phase, elongation, apparent diameter and magnitude of each body.</p>
 
-  <div class="box">
+  <div class="view-form box">
     <BodySelect v-model="bodies.keys" />
     <MomentFields :form="moment" />
-    <b-button type="is-primary" @click="submit" :loading="loading">Run</b-button>
+    <b-button type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
   </div>
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">
@@ -47,4 +48,5 @@ function submit() {
       </b-table>
     </template>
   </ResultPanel>
+  </section>
 </template>

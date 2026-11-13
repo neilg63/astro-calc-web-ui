@@ -25,11 +25,12 @@ function submit() {
 </script>
 
 <template>
-  <h1 class="title">Ascendant</h1>
-  <div class="box">
+  <section class="view-page view-ascendant">
+  <h1 class="view-title title">Ascendant</h1>
+  <div class="view-form box">
     <MomentFields :form="moment" />
     <LocationFields />
-    <b-button type="is-primary" @click="submit" :loading="loading">Run</b-button>
+    <b-button type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
   </div>
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">
@@ -37,4 +38,5 @@ function submit() {
       <p class="title is-4">{{ round((res as AscendantResult).ascendant, 4) }}°</p>
     </template>
   </ResultPanel>
+  </section>
 </template>

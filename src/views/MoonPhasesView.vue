@@ -38,8 +38,9 @@ function submit() {
 </script>
 
 <template>
-  <h1 class="title">Moon Phases</h1>
-  <div class="box">
+  <section class="view-page view-moon-phases">
+  <h1 class="view-title title">Moon Phases</h1>
+  <div class="view-form box">
     <MomentFields :form="moment" />
     <RangeEndFields :form="rangeEnd" />
     <b-field grouped group-multiline>
@@ -54,7 +55,7 @@ function submit() {
       </b-field>
     </b-field>
     <LocationFields v-if="opts.ps === 'topo'" />
-    <b-button type="is-primary" @click="submit" :loading="loading">Run</b-button>
+    <b-button type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
   </div>
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">
@@ -70,4 +71,5 @@ function submit() {
       </b-table>
     </template>
   </ResultPanel>
+  </section>
 </template>

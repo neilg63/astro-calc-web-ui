@@ -36,10 +36,11 @@ function submit() {
 </script>
 
 <template>
-  <h1 class="title">Position</h1>
-  <p class="subtitle">One body's ecliptic, equatorial or horizontal position.</p>
+  <section class="view-page view-position">
+  <h1 class="view-title title">Position</h1>
+  <p class="view-subtitle subtitle">One body's ecliptic, equatorial or horizontal position.</p>
 
-  <div class="box">
+  <div class="view-form box">
     <b-field label="Body" label-position="on-border">
       <b-select v-model="body.key">
         <option v-for="b in reference.bodies" :key="b.key" :value="b.key" :disabled="!b.available">{{ b.name }} ({{ b.key }})</option>
@@ -48,7 +49,7 @@ function submit() {
     <MomentFields :form="moment" />
     <ViewFields :form="view" />
     <AyanamshaFields v-model="aya" show-sidereal />
-    <b-button type="is-primary" @click="submit" :loading="loading">Run</b-button>
+    <b-button type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
   </div>
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">
@@ -69,4 +70,5 @@ function submit() {
       </b-table>
     </template>
   </ResultPanel>
+  </section>
 </template>

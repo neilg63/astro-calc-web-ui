@@ -9,7 +9,8 @@ onMounted(() => run({}))
 </script>
 
 <template>
-  <h1 class="title">Bodies</h1>
+  <section class="view-page view-bodies">
+  <h1 class="view-title title">Bodies</h1>
   <ResultPanel :data="data" :error="error" :loading="loading">
     <template #default="{ data: res }">
       <b-table :data="(res as { bodies: BodyRef[] }).bodies" striped narrowed>
@@ -21,4 +22,5 @@ onMounted(() => run({}))
       </b-table>
     </template>
   </ResultPanel>
+  </section>
 </template>

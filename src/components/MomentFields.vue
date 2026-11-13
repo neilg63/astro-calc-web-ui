@@ -5,7 +5,7 @@ defineProps<{ form: MomentForm; label?: string }>()
 </script>
 
 <template>
-  <b-field :label="label ?? 'Moment'" grouped group-multiline>
+  <b-field class="moment-fields" :label="label ?? 'Moment'" grouped group-multiline>
     <b-field>
       <b-select v-model="form.mode">
         <option value="now">Now</option>

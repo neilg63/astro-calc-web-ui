@@ -29,15 +29,16 @@ function submit() {
 </script>
 
 <template>
-  <h1 class="title">Rise / Set</h1>
-  <div class="box">
+  <section class="view-page view-rise-set">
+  <h1 class="view-title title">Rise / Set</h1>
+  <div class="view-form box">
     <BodySelect v-model="bodies.keys" />
     <MomentFields :form="moment" />
     <LocationFields />
     <b-field label="Mode (disc alignment / refraction)" label-position="on-border">
       <b-numberinput v-model="mode.value" :min="0" :max="7" :controls="false" />
     </b-field>
-    <b-button type="is-primary" @click="submit" :loading="loading">Run</b-button>
+    <b-button type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
   </div>
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">
@@ -55,4 +56,5 @@ function submit() {
       </b-table>
     </template>
   </ResultPanel>
+  </section>
 </template>

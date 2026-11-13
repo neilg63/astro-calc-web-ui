@@ -22,9 +22,10 @@ function update(index: number, key: 'angle' | 'orb', value: number) {
 </script>
 
 <template>
-  <b-field label="Aspect definitions (angle / orb, degrees)">
-    <div v-for="(row, i) in modelValue" :key="i" class="aspect-row">
+  <b-field label="Aspect definitions (angle / orb, degrees)" class="aspect-orbs-editor">
+    <div v-for="(row, i) in modelValue" :key="i" class="aspect-orbs-row">
       <b-numberinput
+        class="aspect-orbs-angle"
         :model-value="row.angle"
         @update:model-value="(v: number) => update(i, 'angle', v)"
         :step="1"
@@ -34,6 +35,7 @@ function update(index: number, key: 'angle' | 'orb', value: number) {
         size="is-small"
       />
       <b-numberinput
+        class="aspect-orbs-orb"
         :model-value="row.orb"
         @update:model-value="(v: number) => update(i, 'orb', v)"
         :step="0.5"
@@ -41,17 +43,8 @@ function update(index: number, key: 'angle' | 'orb', value: number) {
         :controls="false"
         size="is-small"
       />
-      <b-button type="is-danger" size="is-small" outlined icon-left="close" @click="removeRow(i)" />
+      <b-button class="aspect-orbs-remove" type="is-danger" size="is-small" outlined icon-left="close" @click="removeRow(i)" />
     </div>
-    <b-button type="is-primary" size="is-small" outlined icon-left="plus" @click="addRow">Add aspect</b-button>
+    <b-button class="aspect-orbs-add" type="is-primary" size="is-small" outlined icon-left="plus" @click="addRow">Add aspect</b-button>
   </b-field>
 </template>
-
-<style scoped>
-.aspect-row {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  margin-bottom: 0.4rem;
-}
-</style>

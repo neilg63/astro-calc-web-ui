@@ -64,13 +64,14 @@ function submit() {
 </script>
 
 <template>
-  <h1 class="title">Indian Day</h1>
-  <p class="subtitle">The sunrise-to-sunrise day containing the date, with ghati/vighati time units.</p>
+  <section class="view-page view-indian-day">
+  <h1 class="view-title title">Indian Day</h1>
+  <p class="view-subtitle subtitle">The sunrise-to-sunrise day containing the date, with ghati/vighati time units.</p>
 
-  <div class="box">
+  <div class="view-form box">
     <MomentFields :form="moment" />
     <LocationFields />
-    <b-button type="is-primary" @click="submit" :loading="loading">Run</b-button>
+    <b-button type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
   </div>
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">
@@ -81,4 +82,5 @@ function submit() {
       </b-table>
     </template>
   </ResultPanel>
+  </section>
 </template>

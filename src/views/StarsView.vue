@@ -9,7 +9,8 @@ onMounted(() => run({}))
 </script>
 
 <template>
-  <h1 class="title">Named Stars</h1>
+  <section class="view-page view-stars">
+  <h1 class="view-title title">Named Stars</h1>
   <ResultPanel :data="data" :error="error" :loading="loading">
     <template #default="{ data: res }">
       <b-table :data="(res as { stars: StarRef[] }).stars" striped narrowed paginated per-page="20">
@@ -20,4 +21,5 @@ onMounted(() => run({}))
       </b-table>
     </template>
   </ResultPanel>
+  </section>
 </template>

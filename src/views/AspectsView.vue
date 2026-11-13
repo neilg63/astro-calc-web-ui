@@ -40,10 +40,11 @@ function submit() {
 </script>
 
 <template>
-  <h1 class="title">Aspects</h1>
-  <p class="subtitle">Every aspect between the selected bodies, by ecliptic longitude.</p>
+  <section class="view-page view-aspects">
+  <h1 class="view-title title">Aspects</h1>
+  <p class="view-subtitle subtitle">Every aspect between the selected bodies, by ecliptic longitude.</p>
 
-  <div class="box">
+  <div class="view-form box">
     <BodySelect v-model="bodies.keys" />
     <MomentFields :form="moment" />
     <b-field label="Perspective" label-position="on-border">
@@ -54,7 +55,7 @@ function submit() {
     </b-field>
     <LocationFields v-if="ps.value === 'topo'" />
     <AspectOrbsEditor v-model="aspects.defs" />
-    <b-button type="is-primary" @click="submit" :loading="loading">Run</b-button>
+    <b-button type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
   </div>
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">
@@ -69,4 +70,5 @@ function submit() {
       </b-table>
     </template>
   </ResultPanel>
+  </section>
 </template>

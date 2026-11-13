@@ -5,7 +5,7 @@ const prefs = usePreferencesStore()
 </script>
 
 <template>
-  <b-field label="Location" grouped group-multiline>
+  <b-field class="location-fields" label="Location" grouped group-multiline>
     <b-field label="Latitude" label-position="on-border">
       <b-numberinput v-model="prefs.lat" :step="0.0001" :min="-90" :max="90" :controls="false" />
     </b-field>

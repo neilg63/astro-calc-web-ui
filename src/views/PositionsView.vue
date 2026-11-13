@@ -34,15 +34,16 @@ function submit() {
 </script>
 
 <template>
-  <h1 class="title">Positions</h1>
-  <p class="subtitle">Several bodies at one moment.</p>
+  <section class="view-page view-positions">
+  <h1 class="view-title title">Positions</h1>
+  <p class="view-subtitle subtitle">Several bodies at one moment.</p>
 
-  <div class="box">
+  <div class="view-form box">
     <BodySelect v-model="bodies.keys" />
     <MomentFields :form="moment" />
     <ViewFields :form="view" />
     <AyanamshaFields v-model="aya" show-sidereal />
-    <b-button type="is-primary" @click="submit" :loading="loading">Run</b-button>
+    <b-button type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
   </div>
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">
@@ -63,4 +64,5 @@ function submit() {
       </b-table>
     </template>
   </ResultPanel>
+  </section>
 </template>

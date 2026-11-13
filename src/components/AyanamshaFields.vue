@@ -25,7 +25,7 @@ const sidereal = computed({
 </script>
 
 <template>
-  <b-field label="Ayanamshas" grouped group-multiline>
+  <b-field class="ayanamsha-fields" label="Ayanamshas" grouped group-multiline>
     <b-field label-position="on-border">
       <b-select multiple expanded native-size="6" v-model="selected">
         <option v-for="a in reference.ayanamshas" :key="a.key" :value="a.key">{{ a.name }}</option>
