@@ -1,18 +1,16 @@
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { ref } from 'vue'
 import { useEndpoint } from '../api/useEndpoint'
 import { momentParams, useMomentForm } from '../lib/queryForms'
 import MomentFields from '../components/MomentFields.vue'
 import ResultPanel from '../components/ResultPanel.vue'
-import { useReferenceStore } from '../stores/reference'
+import AyanamshaFields, { type AyanamshaFormValue } from '../components/AyanamshaFields.vue'
 import { round } from '../lib/format'
 import type { AyanamshaValue } from '../api/types'
-import { onMounted } from 'vue'
 
 const moment = useMomentForm()
-const reference = useReferenceStore()
-onMounted(() => reference.loadAll())
-const selection = reactive({ keys: [] as string[] })
+// A ref, not a reactive object: the field replaces the whole value on every change.
+const selection = ref<AyanamshaFormValue>({ aya: [], sid: false })
 
 interface AyanamshaResult {
   date: unknown
@@ -22,7 +20,7 @@ interface AyanamshaResult {
 const { data, error, loading, run, lastUrl } = useEndpoint<AyanamshaResult>('/ayanamsha')
 
 function submit() {
-  run({ ...momentParams(moment), aya: selection.keys.length ? selection.keys : 'all' })
+  run({ ...momentParams(moment), aya: selection.value.aya.length ? selection.value.aya : 'all' })
 }
 </script>
 
@@ -31,11 +29,7 @@ function submit() {
   <h1 class="view-title title">Ayanamsha</h1>
   <div class="view-form box horizontal-form">
     <MomentFields :form="moment" />
-    <b-field label="Ayanamshas (none = all)" label-position="on-border">
-      <b-select size="is-small" multiple expanded native-size="6" v-model="selection.keys">
-        <option v-for="a in reference.ayanamshas" :key="a.key" :value="a.key">{{ a.name }}</option>
-      </b-select>
-    </b-field>
+    <AyanamshaFields v-model="selection" empty-label="All" />
     <b-button size="is-small" type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
   </div>
 

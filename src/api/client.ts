@@ -1,10 +1,11 @@
 import axios from 'axios'
 
-/** Drops null/undefined/empty-string params and joins array values with commas. */
+/** Drops null/undefined/empty-string/non-finite params and joins array values with commas. */
 export function cleanParams(params: Record<string, unknown>): Record<string, string> {
   const out: Record<string, string> = {}
   for (const [key, value] of Object.entries(params)) {
     if (value === null || value === undefined || value === '') continue
+    if (typeof value === 'number' && !Number.isFinite(value)) continue
     if (Array.isArray(value)) {
       if (value.length === 0) continue
       out[key] = value.join(',')

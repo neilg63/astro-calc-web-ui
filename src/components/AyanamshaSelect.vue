@@ -19,7 +19,7 @@ const selected = computed({
   <b-field class="ayanamsha-select" :label="label ?? 'Zodiac'" label-position="on-border">
     <b-select v-model="selected" size="is-small">
       <option value="">Tropical</option>
-      <option v-for="a in reference.ayanamshas" :key="a.key" :value="a.key">Sidereal: {{ a.name }}</option>
+      <option v-for="a in reference.ayanamshas" :key="a.key" :value="a.key">{{ a.name.replace(/_/g, ' ') }}</option>
     </b-select>
   </b-field>
 </template>

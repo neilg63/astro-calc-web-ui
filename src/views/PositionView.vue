@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, reactive } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { useEndpoint } from '../api/useEndpoint'
 import { useReferenceStore } from '../stores/reference'
 import { momentParams, useMomentForm, useViewForm, viewParams } from '../lib/queryForms'
@@ -17,7 +17,8 @@ onMounted(() => reference.loadAll())
 const moment = useMomentForm()
 const view = useViewForm()
 const body = reactive({ key: 'su' })
-const aya = reactive<AyanamshaFormValue>({ aya: [], sid: false })
+// A ref, not a reactive object: the field replaces the whole value on every change.
+const aya = ref<AyanamshaFormValue>({ aya: [], sid: false })
 
 interface PositionResult {
   date: unknown
@@ -32,7 +33,7 @@ interface PositionResult {
 const { data, error, loading, run, lastUrl } = useEndpoint<PositionResult>('/position')
 
 function submit() {
-  run({ body: body.key, ...momentParams(moment), ...viewParams(view), aya: aya.aya, sid: aya.sid ? 1 : undefined })
+  run({ body: body.key, ...momentParams(moment), ...viewParams(view), aya: aya.value.aya, sid: aya.value.sid ? 1 : undefined })
 }
 </script>
 

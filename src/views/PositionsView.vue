@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import { useEndpoint } from '../api/useEndpoint'
 import { CORE_BODY_KEYS } from '../stores/reference'
 import { momentParams, useMomentForm, useViewForm, viewParams } from '../lib/queryForms'
@@ -15,7 +15,8 @@ import type { AyanamshaValue, BodyPosition, GeoJson } from '../api/types'
 const moment = useMomentForm()
 const view = useViewForm()
 const bodies = reactive({ keys: [...CORE_BODY_KEYS] })
-const aya = reactive<AyanamshaFormValue>({ aya: [], sid: false })
+// A ref, not a reactive object: the field replaces the whole value on every change.
+const aya = ref<AyanamshaFormValue>({ aya: [], sid: false })
 
 interface PositionsResult {
   date: unknown
@@ -30,7 +31,7 @@ interface PositionsResult {
 const { data, error, loading, run, lastUrl } = useEndpoint<PositionsResult>('/positions')
 
 function submit() {
-  run({ bodies: bodies.keys, ...momentParams(moment), ...viewParams(view), aya: aya.aya, sid: aya.sid ? 1 : undefined })
+  run({ bodies: bodies.keys, ...momentParams(moment), ...viewParams(view), aya: aya.value.aya, sid: aya.value.sid ? 1 : undefined })
 }
 </script>
 

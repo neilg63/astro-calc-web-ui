@@ -27,7 +27,7 @@ function defaults(): PreferencesState {
     apiBase: 'https://astrocalc.multifaceted.info',
     lat: 51.5074,
     lng: -0.1278,
-    alt: 0,
+    alt: 100,
     tzOffsetHours: 0,
     cs: 'ecl',
     ps: 'geo',
@@ -36,10 +36,11 @@ function defaults(): PreferencesState {
     houseSystems: ['W'],
     aspects: [
       { angle: 0, orb: 8 },
-      { angle: 60, orb: 6 },
+      { angle: 180, orb: 8 },
       { angle: 90, orb: 8 },
       { angle: 120, orb: 8 },
-      { angle: 180, orb: 8 },
+      { angle: 150, orb: 3 },
+      { angle: 60, orb: 6 },
     ],
     defaultOrb: 8,
   }
@@ -57,8 +58,15 @@ function loadFromStorage(): Partial<PreferencesState> {
 export const usePreferencesStore = defineStore('preferences', {
   state: (): PreferencesState => ({ ...defaults(), ...loadFromStorage() }),
   getters: {
+    /**
+     * `lat,lng,alt` for the API. A cleared number box holds null, which must never reach the
+     * query string: a blank altitude is left off, and without both a latitude and a longitude
+     * there is no location at all (an empty string, which is dropped from the request).
+     */
     loc(state): string {
-      return `${state.lat},${state.lng},${state.alt}`
+      const isNumber = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v)
+      if (!isNumber(state.lat) || !isNumber(state.lng)) return ''
+      return isNumber(state.alt) ? `${state.lat},${state.lng},${state.alt}` : `${state.lat},${state.lng}`
     },
   },
   actions: {

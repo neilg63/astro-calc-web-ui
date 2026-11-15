@@ -12,7 +12,7 @@ const prefs = usePreferencesStore()
     <b-field label="Longitude" label-position="on-border">
       <b-numberinput v-model="prefs.lng" :step="0.0001" :min="-180" :max="180" :controls="false" size="is-small" />
     </b-field>
-    <b-field label="Altitude (m)" label-position="on-border">
+    <b-field class="location-altitude" label="Altitude (m)" label-position="on-border">
       <b-numberinput v-model="prefs.alt" :step="1" :controls="false" size="is-small" />
     </b-field>
   </b-field>

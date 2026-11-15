@@ -4,7 +4,11 @@ import { usePreferencesStore } from '../stores/preferences'
 
 /** Serializes aspect definitions into the API's `angle:orb,angle:orb` form. */
 export function aspectsParam(defs: AspectDef[]): string {
-  return defs.map((d) => `${d.angle}:${d.orb}`).join(',')
+  // A cleared orb box holds null: send the angle alone and the API applies its default orb.
+  return defs
+    .filter((d) => Number.isFinite(d.angle))
+    .map((d) => (Number.isFinite(d.orb) ? `${d.angle}:${d.orb}` : `${d.angle}`))
+    .join(',')
 }
 
 /** Local date-time input (`datetime-local`) + timezone-offset hours, a fixed Julian Day, or "now". */
