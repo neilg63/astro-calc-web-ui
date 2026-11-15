@@ -15,7 +15,7 @@ defineProps<{ loading: boolean; error: string | null; data: unknown; lastUrl?: s
       <div class="result-panel-body">
         <slot :data="data" />
       </div>
-      <b-collapse class="result-panel-raw-toggle mt-4" animation="slide">
+      <b-collapse class="result-panel-raw-toggle mt-4" animation="slide" :model-value="false">
         <template #trigger="props">
           <a class="is-size-7">{{ props.open ? 'Hide' : 'Show' }} raw JSON</a>
         </template>

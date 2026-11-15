@@ -27,12 +27,12 @@ const sidereal = computed({
 <template>
   <b-field class="ayanamsha-fields" label="Ayanamshas" grouped group-multiline>
     <b-field label-position="on-border">
-      <b-select multiple expanded native-size="6" v-model="selected">
+      <b-select size="is-small" multiple expanded native-size="6" v-model="selected">
         <option v-for="a in reference.ayanamshas" :key="a.key" :value="a.key">{{ a.name }}</option>
       </b-select>
     </b-field>
     <b-field v-if="showSidereal">
-      <b-checkbox v-model="sidereal">Subtract first selected ayanamsha (sidereal)</b-checkbox>
+      <b-checkbox size="is-small" v-model="sidereal">Subtract first selected ayanamsha (sidereal)</b-checkbox>
     </b-field>
   </b-field>
 </template>

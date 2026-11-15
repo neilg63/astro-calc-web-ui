@@ -43,14 +43,14 @@ function submit() {
 
   <div class="view-form box horizontal-form">
     <b-field label="Body" label-position="on-border">
-      <b-select v-model="body.key">
+      <b-select size="is-small" v-model="body.key">
         <option v-for="b in reference.bodies" :key="b.key" :value="b.key" :disabled="!b.available">{{ b.name }} ({{ b.key }})</option>
       </b-select>
     </b-field>
     <MomentFields :form="moment" />
     <ViewFields :form="view" />
     <AyanamshaFields v-model="aya" show-sidereal />
-    <b-button type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
+    <b-button size="is-small" type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
   </div>
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">

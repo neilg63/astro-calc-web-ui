@@ -15,14 +15,14 @@ defineProps<{ form: MomentForm; label?: string }>()
     
     <template v-if="form.mode === 'dt'">
       <b-field label="Local date-time" label-position="on-border">
-        <b-input v-model="form.dt" type="datetime-local" step="1" />
+        <b-input size="is-small" v-model="form.dt" type="datetime-local" step="1" />
       </b-field>
       <b-field label="UTC offset (h)" label-position="on-border">
-        <b-numberinput v-model="form.tzoh" :step="0.5" :min="-14" :max="14" :controls="false" />
+        <b-numberinput size="is-small" v-model="form.tzoh" :step="0.5" :min="-14" :max="14" :controls="false" />
       </b-field>
     </template>
     <b-field v-else-if="form.mode === 'jd'" label="Julian Day (UT)" label-position="on-border">
-      <b-numberinput v-model="form.jd" :step="0.5" :controls="false" />
+      <b-numberinput size="is-small" v-model="form.jd" :step="0.5" :controls="false" />
     </b-field>
   </b-field>
 </template>

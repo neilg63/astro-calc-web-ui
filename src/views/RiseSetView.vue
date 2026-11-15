@@ -36,9 +36,9 @@ function submit() {
     <MomentFields :form="moment" />
     <LocationFields />
     <b-field label="Mode (disc alignment / refraction)" label-position="on-border">
-      <b-numberinput v-model="mode.value" :min="0" :max="7" :controls="false" />
+      <b-numberinput size="is-small" v-model="mode.value" :min="0" :max="7" :controls="false" />
     </b-field>
-    <b-button type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
+    <b-button size="is-small" type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
   </div>
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">

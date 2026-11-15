@@ -33,7 +33,7 @@ function submit() {
   <div class="view-form box horizontal-form">
     <BodySelect v-model="bodies.keys" />
     <MomentFields :form="moment" />
-    <b-button type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
+    <b-button size="is-small" type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
   </div>
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">

@@ -35,7 +35,7 @@ function submit() {
     <MomentFields :form="moment" />
     <LocationFields />
     <HouseSystemSelect v-model="systems.codes" />
-    <b-button type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
+    <b-button size="is-small" type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
   </div>
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">

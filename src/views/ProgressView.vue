@@ -78,19 +78,19 @@ function submit() {
     <ViewFields :form="view" />
     <b-field grouped group-multiline>
       <b-field label="Span unit" label-position="on-border">
-        <b-select v-model="span.unit">
+        <b-select size="is-small" v-model="span.unit">
           <option value="days">Days</option>
           <option value="years">Years (secondary progression)</option>
         </b-select>
       </b-field>
       <b-field :label="span.unit === 'days' ? 'Days' : 'Years'" label-position="on-border">
-        <b-numberinput v-model="span.amount" :min="0" :controls="false" />
+        <b-numberinput size="is-small" v-model="span.amount" :min="0" :controls="false" />
       </b-field>
       <b-field label="Samples per unit" label-position="on-border">
-        <b-numberinput v-model="span.pd" :min="0.01" :step="0.5" :controls="false" />
+        <b-numberinput size="is-small" v-model="span.pd" :min="0.01" :step="0.5" :controls="false" />
       </b-field>
     </b-field>
-    <b-button type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
+    <b-button size="is-small" type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
   </div>
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">

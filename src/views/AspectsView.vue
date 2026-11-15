@@ -48,14 +48,14 @@ function submit() {
     <BodySelect v-model="bodies.keys" />
     <MomentFields :form="moment" />
     <b-field label="Perspective" label-position="on-border">
-      <b-select v-model="ps.value">
+      <b-select size="is-small" v-model="ps.value">
         <option value="geo">Geocentric</option>
         <option value="topo">Topocentric</option>
       </b-select>
     </b-field>
     <LocationFields v-if="ps.value === 'topo'" />
     <AspectOrbsEditor v-model="aspects.defs" />
-    <b-button type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
+    <b-button size="is-small" type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
   </div>
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">

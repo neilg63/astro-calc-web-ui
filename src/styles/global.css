@@ -21,9 +21,12 @@
  *   Settings        .settings-form, .settings-actions
  *   Results         .result-panel, .result-panel-error, .result-panel-loading,
  *                   .result-panel-url, .result-panel-body,
- *                   .result-panel-raw-toggle, .result-panel-raw
+ *                   .result-panel-raw-toggle, .result-panel-raw,
+ *                   .result-summary (one-line caption above a table),
+ *                   .jd-table (tables of date-times), .rise-sets-tabs
  *   Form components .moment-fields, .location-fields, .view-fields,
  *                   .body-select, .ayanamsha-fields, .house-system-select,
+ *                   .single-body-select, .ayanamsha-select, .bulk-records,
  *                   .range-end-fields, .aspect-orbs-editor, .aspect-orbs-row,
  *                   .aspect-orbs-angle, .aspect-orbs-orb, .aspect-orbs-remove,
  *                   .aspect-orbs-add
@@ -210,7 +213,7 @@
 
 #app .horizontal-form {
   display: flex;
-  flex-flow: row nowrap;
+  flex-flow: row wrap;
   align-items: flex-end;
 }
 
@@ -252,4 +255,72 @@
 
 #app .horizontal-form .body-select select {
   max-height: 4em;
+}
+
+/* ---- Result captions and date-time tables ---- */
+
+#app .result-summary {
+  font-size: 0.8em;
+  color: var(--acw-text-muted);
+  margin-bottom: 0.5em;
+}
+
+#app .jd-table td {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+#app .rise-sets-tabs .tab-content {
+  padding: 0.5em 0 0;
+}
+
+/* ---- Bulk ---- */
+
+#app .horizontal-form .bulk-records {
+  flex: 1 1 100%;
+}
+
+#app .horizontal-form .bulk-records textarea {
+  font-family: monospace;
+  font-size: 0.75em;
+}
+
+/* ---- ViewFields inside a horizontal form: lay its fields out in the same row ---- */
+
+#app .horizontal-form .view-fields {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: flex-end;
+}
+
+#app .horizontal-form .view-fields > .field {
+  position: relative;
+  margin-right: 0.5em;
+  margin-bottom: 0.75rem;
+}
+
+#app .horizontal-form .view-fields > .field > label,
+#app .horizontal-form .view-fields > .field:not(.location-fields) .field > label {
+  font-size: 0.75em;
+  font-weight: normal;
+  color: var(--acw-accent-2);
+}
+
+#app .horizontal-form .view-fields > .location-fields .field {
+  position: relative;
+}
+
+#app .horizontal-form .view-fields > .location-fields .field > label {
+  font-size: 0.625em;
+  font-weight: normal;
+  color: var(--acw-border);
+  pointer-events: none;
+  opacity: 0.75;
+  text-align: left;
+  position: absolute;
+  left: -2.75em;
+  display: block;
+  padding: 0;
+  top: -1.375em;
+  font-style: italic;
 }

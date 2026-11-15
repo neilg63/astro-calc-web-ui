@@ -32,11 +32,11 @@ function submit() {
   <div class="view-form box horizontal-form">
     <MomentFields :form="moment" />
     <b-field label="Ayanamshas (none = all)" label-position="on-border">
-      <b-select multiple expanded native-size="6" v-model="selection.keys">
+      <b-select size="is-small" multiple expanded native-size="6" v-model="selection.keys">
         <option v-for="a in reference.ayanamshas" :key="a.key" :value="a.key">{{ a.name }}</option>
       </b-select>
     </b-field>
-    <b-button type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
+    <b-button size="is-small" type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
   </div>
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">

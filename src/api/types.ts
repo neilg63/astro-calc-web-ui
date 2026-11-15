@@ -122,3 +122,87 @@ export interface PhenoEntry {
   diameter: number
   magnitude: number | null
 }
+
+export interface BodyLongitude {
+  key: string
+  lng: number
+}
+
+/** A position in all three coordinate systems (`cs=all`): ecliptic, equatorial and horizontal. */
+export interface ExtendedBodyPosition extends BodyPosition {
+  ras: number
+  dcl: number
+  azi: number
+  alt: number
+  ras_speed: number
+  dcl_speed: number
+  azi_speed: number
+  alt_speed: number
+}
+
+/** One local day of `/rise-sets`. Times are Julian Days (UT); `null` when the event does not happen that day. */
+export interface RiseSetDay {
+  day_start: number
+  rise: number | null
+  mc: number | null
+  set: number | null
+  ic: number | null
+  alt_min: number
+  alt_max: number
+}
+
+export interface RiseSetDaysForBody {
+  key: string
+  days: RiseSetDay[]
+}
+
+export interface RiseSetOptionsJson {
+  disc: string
+  refraction: boolean
+  pressure: number | null
+  temp: number | null
+  fixed: boolean
+  horizon: number | null
+  twilight: string | null
+  dip: boolean
+  geocentric: boolean
+  ignore_latitude: boolean
+}
+
+export interface BulkLabel {
+  ref: string
+  tags?: unknown
+}
+
+export interface BulkChart extends BulkLabel {
+  date: Moment
+  geo: GeoJson
+  engine: string
+  bodies: BodyPosition[]
+}
+
+export interface BulkAspectHit {
+  a: string
+  b: string
+  lng_a: number
+  lng_b: number
+  aspect: number
+  orb: number
+  divergence: number
+}
+
+/** One-to-many matches carry the target's own `ref`; pairs and many-to-many carry `a` and `b`. */
+export interface BulkMatch {
+  ref?: string
+  tags?: unknown
+  a?: BulkLabel
+  b?: BulkLabel
+  closest: number
+  aspects: BulkAspectHit[]
+}
+
+export interface BulkError {
+  ref?: string | null
+  index?: number
+  error: string
+}

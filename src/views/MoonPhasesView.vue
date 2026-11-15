@@ -45,17 +45,17 @@ function submit() {
     <RangeEndFields :form="rangeEnd" />
     <b-field grouped group-multiline>
       <b-field label="Count (when open-ended)" label-position="on-border">
-        <b-numberinput v-model="opts.num" :min="1" :max="1000" :controls="false" />
+        <b-numberinput size="is-small" v-model="opts.num" :min="1" :max="1000" :controls="false" />
       </b-field>
       <b-field label="Perspective" label-position="on-border">
-        <b-select v-model="opts.ps">
+        <b-select size="is-small" v-model="opts.ps">
           <option value="geo">Geocentric</option>
           <option value="topo">Topocentric</option>
         </b-select>
       </b-field>
     </b-field>
     <LocationFields v-if="opts.ps === 'topo'" />
-    <b-button type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
+    <b-button size="is-small" type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
   </div>
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">

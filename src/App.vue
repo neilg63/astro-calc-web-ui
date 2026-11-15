@@ -23,6 +23,6 @@ const navOpen = ref(false)
   </nav>
   <div v-if="navOpen" class="app-nav-backdrop" @click="navOpen = false" />
   <main class="app-main container is-fluid px-4 py-4">
-    <RouterView />
+    <RouterView :key="$route.path" />
   </main>
 </template>

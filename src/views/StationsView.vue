@@ -46,13 +46,13 @@ function submit() {
     <RangeEndFields :form="rangeEnd" />
     <b-field grouped group-multiline>
       <b-field label="Count (when open-ended)" label-position="on-border">
-        <b-numberinput v-model="opts.num" :min="1" :max="1000" :controls="false" />
+        <b-numberinput size="is-small" v-model="opts.num" :min="1" :max="1000" :controls="false" />
       </b-field>
       <b-field label="Before" label-position="on-border">
-        <b-numberinput v-model="opts.before" :min="0" :controls="false" />
+        <b-numberinput size="is-small" v-model="opts.before" :min="0" :controls="false" />
       </b-field>
     </b-field>
-    <b-button type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
+    <b-button size="is-small" type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
   </div>
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">

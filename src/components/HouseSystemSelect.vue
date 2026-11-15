@@ -16,7 +16,7 @@ const selected = computed({
 
 <template>
   <b-field class="house-system-select" label="House systems" label-position="on-border">
-    <b-select multiple expanded native-size="6" v-model="selected">
+    <b-select size="is-small" multiple expanded native-size="6" v-model="selected">
       <option v-for="h in reference.houseSystems" :key="h.code" :value="h.code">{{ h.name }}</option>
     </b-select>
   </b-field>
