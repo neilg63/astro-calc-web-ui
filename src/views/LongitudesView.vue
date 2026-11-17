@@ -2,8 +2,8 @@
 import { computed, reactive } from 'vue'
 import { useEndpoint } from '../api/useEndpoint'
 import { useReferenceStore } from '../stores/reference'
-import { momentParams, useMomentForm, useViewForm } from '../lib/queryForms'
-import { usePreferencesStore } from '../stores/preferences'
+import { momentParams, useMomentForm, useViewForm, viewLocation } from '../lib/queryForms'
+import { perspectiveBodies } from '../lib/perspectives'
 import MomentFields from '../components/MomentFields.vue'
 import ViewFields from '../components/ViewFields.vue'
 import AyanamshaSelect from '../components/AyanamshaSelect.vue'
@@ -18,7 +18,6 @@ import type { AyanamshaValue, BodyLongitude, GeoJson } from '../api/types'
 const props = defineProps<{ single?: boolean }>()
 
 const reference = useReferenceStore()
-const prefs = usePreferencesStore()
 const moment = useMomentForm()
 const view = useViewForm()
 const form = reactive({ body: 'su', bodies: ['as', 'su', 'mo', 'me', 've', 'ma', 'ju', 'sa', 'ur', 'ne', 'pl', 'ke', 'ra'], aya: '' })
@@ -52,12 +51,14 @@ function bodyName(key: string): string {
 
 function submit() {
   // Without a place the ascendant cannot be calculated, and naming it is an error.
-  const keys = view.useLocation ? form.bodies : form.bodies.filter((k) => k !== 'as')
+  const loc = viewLocation(view)
+  // The ascendant needs a place.
+  const keys = perspectiveBodies(form.bodies, view.ps).keys.filter((k) => loc || k !== 'as')
   run({
     ...(props.single ? { body: form.body } : { bodies: keys }),
     ...momentParams(moment),
     ps: view.ps,
-    loc: view.useLocation || view.ps === 'topo' ? prefs.loc : undefined,
+    loc,
     aya: form.aya,
   })
 }
@@ -72,7 +73,7 @@ function submit() {
       <SingleBodySelect v-if="single" v-model="form.body" />
       <BodySelect v-else v-model="form.bodies" />
       <MomentFields :form="moment" />
-      <ViewFields :form="view" hide-cs :location-required="view.ps === 'topo'" />
+      <ViewFields :form="view" hide-cs :bodies="single ? undefined : form.bodies" />
       <AyanamshaSelect v-model="form.aya" />
       <b-button size="is-small" type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
     </div>

@@ -3,8 +3,8 @@ import { onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useEndpoint } from '../api/useEndpoint'
 import type { IndexInfo } from '../api/types'
+import UtcTime from '../components/UtcTime.vue'
 import ResultPanel from '../components/ResultPanel.vue'
-import { formatMoment } from '../lib/format'
 import { ENDPOINT_LINKS } from '../lib/navLinks'
 
 const { data, error, loading, run } = useEndpoint<IndexInfo>('/')
@@ -29,8 +29,8 @@ onMounted(() => run({}))
         <div class="home-info-box box">
           <p><strong>{{ (info as IndexInfo).name }}</strong> v{{ (info as IndexInfo).version }}</p>
           <p v-if="(info as IndexInfo).ephemeris_range">
-            Ephemeris coverage: {{ formatMoment((info as IndexInfo).ephemeris_range!.from) }} —
-            {{ formatMoment((info as IndexInfo).ephemeris_range!.to) }}
+            Ephemeris coverage: <UtcTime :value="(info as IndexInfo).ephemeris_range!.from" /> —
+            <UtcTime :value="(info as IndexInfo).ephemeris_range!.to" />
           </p>
           <p>Station table: {{ (info as IndexInfo).station_table ? 'available' : 'not loaded' }}</p>
         </div>

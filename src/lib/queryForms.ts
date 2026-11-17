@@ -1,6 +1,7 @@
 import { reactive } from 'vue'
-import type { AspectDef } from '../stores/preferences'
+import type { AspectDef, MomentChoice } from '../stores/preferences'
 import { usePreferencesStore } from '../stores/preferences'
+import { perspective, type PerspectiveKey } from './perspectives'
 
 /** Serializes aspect definitions into the API's `angle:orb,angle:orb` form. */
 export function aspectsParam(defs: AspectDef[]): string {
@@ -11,17 +12,15 @@ export function aspectsParam(defs: AspectDef[]): string {
     .join(',')
 }
 
-/** Local date-time input (`datetime-local`) + timezone-offset hours, a fixed Julian Day, or "now". */
-export interface MomentForm {
-  mode: 'now' | 'dt' | 'jd'
-  dt: string
-  tzoh: number
-  jd: number
-}
+/** "Now", a date-time (read as UTC) or a Julian Day. */
+export type MomentForm = MomentChoice
 
+/**
+ * The date-time form shared by every page. It lives in the preferences store, so the last
+ * date-time entered is still there on the next page and on the next visit.
+ */
 export function useMomentForm(): MomentForm {
-  const prefs = usePreferencesStore()
-  return reactive({ mode: 'now', dt: '', tzoh: prefs.tzOffsetHours, jd: 2451545.0 })
+  return usePreferencesStore().moment
 }
 
 export function momentParams(form: MomentForm): Record<string, unknown> {
@@ -29,7 +28,8 @@ export function momentParams(form: MomentForm): Record<string, unknown> {
     case 'jd':
       return { jd: form.jd }
     case 'dt':
-      return { dt: form.dt, tzoh: form.tzoh }
+      // No offset is sent: the API reads `dt` as UTC.
+      return { dt: form.dt }
     default:
       return {}
   }
@@ -63,7 +63,7 @@ export function rangeEndParams(form: RangeEndForm): Record<string, unknown> {
 export interface ViewForm {
   useLocation: boolean
   cs: 'ecl' | 'equ' | 'hor'
-  ps: 'geo' | 'topo'
+  ps: PerspectiveKey
 }
 
 export function useViewForm(): ViewForm {
@@ -72,10 +72,19 @@ export function useViewForm(): ViewForm {
 }
 
 export function viewParams(form: ViewForm): Record<string, unknown> {
-  const prefs = usePreferencesStore()
   return {
     cs: form.cs,
     ps: form.ps,
-    ...(form.useLocation ? { loc: prefs.loc } : {}),
+    loc: viewLocation(form),
   }
+}
+
+/**
+ * The location to send with a view: always for a perspective on the Earth's surface, by
+ * choice for the geocentric one, and never for a centre away from the Earth.
+ */
+export function viewLocation(form: ViewForm, required = false): string | undefined {
+  const prefs = usePreferencesStore()
+  const ps = perspective(form.ps)
+  return required || ps.needsLocation || (ps.earth && form.useLocation) ? prefs.loc : undefined
 }

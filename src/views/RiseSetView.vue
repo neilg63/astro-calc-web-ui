@@ -5,9 +5,10 @@ import { momentParams, useMomentForm } from '../lib/queryForms'
 import MomentFields from '../components/MomentFields.vue'
 import LocationFields from '../components/LocationFields.vue'
 import BodySelect from '../components/BodySelect.vue'
+import UtcTime from '../components/UtcTime.vue'
 import ResultPanel from '../components/ResultPanel.vue'
 import { usePreferencesStore } from '../stores/preferences'
-import { formatMoment, round } from '../lib/format'
+import { round } from '../lib/format'
 import type { DayTransitsForBody, GeoJson } from '../api/types'
 
 const moment = useMomentForm()
@@ -45,12 +46,12 @@ function submit() {
     <template #default="{ data: res }">
       <b-table :data="(res as RiseSetResult).bodies" striped narrowed>
         <b-table-column field="key" label="Body" v-slot="props">{{ props.row.key }}</b-table-column>
-        <b-table-column field="prev_set" label="Prev set" v-slot="props">{{ formatMoment(props.row.prev_set) }}</b-table-column>
-        <b-table-column field="rise" label="Rise" v-slot="props">{{ formatMoment(props.row.rise) }}</b-table-column>
-        <b-table-column field="mc" label="MC" v-slot="props">{{ formatMoment(props.row.mc) }}</b-table-column>
-        <b-table-column field="set" label="Set" v-slot="props">{{ formatMoment(props.row.set) }}</b-table-column>
-        <b-table-column field="ic" label="IC" v-slot="props">{{ formatMoment(props.row.ic) }}</b-table-column>
-        <b-table-column field="next_rise" label="Next rise" v-slot="props">{{ formatMoment(props.row.next_rise) }}</b-table-column>
+        <b-table-column field="prev_set" label="Prev set" v-slot="props"><UtcTime :value="props.row.prev_set" /></b-table-column>
+        <b-table-column field="rise" label="Rise" v-slot="props"><UtcTime :value="props.row.rise" /></b-table-column>
+        <b-table-column field="mc" label="MC" v-slot="props"><UtcTime :value="props.row.mc" /></b-table-column>
+        <b-table-column field="set" label="Set" v-slot="props"><UtcTime :value="props.row.set" /></b-table-column>
+        <b-table-column field="ic" label="IC" v-slot="props"><UtcTime :value="props.row.ic" /></b-table-column>
+        <b-table-column field="next_rise" label="Next rise" v-slot="props"><UtcTime :value="props.row.next_rise" /></b-table-column>
         <b-table-column field="min_alt" label="Min alt" v-slot="props">{{ round(props.row.min_alt) }}</b-table-column>
         <b-table-column field="max_alt" label="Max alt" v-slot="props">{{ round(props.row.max_alt) }}</b-table-column>
       </b-table>

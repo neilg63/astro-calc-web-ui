@@ -6,9 +6,10 @@ import { momentParams, useMomentForm } from '../lib/queryForms'
 import MomentFields from '../components/MomentFields.vue'
 import LocationFields from '../components/LocationFields.vue'
 import BodySelect from '../components/BodySelect.vue'
+import UtcTime from '../components/UtcTime.vue'
 import ResultPanel from '../components/ResultPanel.vue'
 import { usePreferencesStore } from '../stores/preferences'
-import { formatJd, round, type JdDisplayMode } from '../lib/format'
+import { round, type JdDisplayMode } from '../lib/format'
 import type { GeoJson, RiseSetDay, RiseSetDaysForBody, RiseSetOptionsJson } from '../api/types'
 
 const reference = useReferenceStore()
@@ -139,11 +140,11 @@ function submit() {
         <b-tabs v-model="activeTab" size="is-small" :animated="false" class="rise-sets-tabs">
           <b-tab-item v-for="body in (res as RiseSetsResult).bodies" :key="body.key" :label="bodyName(body.key)">
             <b-table :data="body.days" striped narrowed class="jd-table">
-              <b-table-column field="day_start" label="Day start" v-slot="props">{{ formatJd(props.row.day_start, form.times) }}</b-table-column>
-              <b-table-column field="rise" label="Rise" v-slot="props">{{ formatJd(props.row.rise, form.times) }}</b-table-column>
-              <b-table-column field="mc" label="MC (upper transit)" v-slot="props">{{ formatJd(props.row.mc, form.times) }}</b-table-column>
-              <b-table-column field="set" label="Set" v-slot="props">{{ formatJd(props.row.set, form.times) }}</b-table-column>
-              <b-table-column field="ic" label="IC (lower transit)" v-slot="props">{{ formatJd(props.row.ic, form.times) }}</b-table-column>
+              <b-table-column field="day_start" label="Day start" v-slot="props"><UtcTime :value="props.row.day_start" :mode="form.times" /></b-table-column>
+              <b-table-column field="rise" label="Rise" v-slot="props"><UtcTime :value="props.row.rise" :mode="form.times" /></b-table-column>
+              <b-table-column field="mc" label="MC (upper transit)" v-slot="props"><UtcTime :value="props.row.mc" :mode="form.times" /></b-table-column>
+              <b-table-column field="set" label="Set" v-slot="props"><UtcTime :value="props.row.set" :mode="form.times" /></b-table-column>
+              <b-table-column field="ic" label="IC (lower transit)" v-slot="props"><UtcTime :value="props.row.ic" :mode="form.times" /></b-table-column>
               <b-table-column field="alt_min" label="Alt min" numeric v-slot="props">{{ round(props.row.alt_min, 3) }}°</b-table-column>
               <b-table-column field="alt_max" label="Alt max" numeric v-slot="props">{{ round(props.row.alt_max, 3) }}°</b-table-column>
               <b-table-column label="Note" v-slot="props">

@@ -1,8 +1,24 @@
 import type { Moment } from '../api/types'
+import { julToDateTimeString } from './julian-date'
 
-export function formatMoment(m: Moment | null | undefined): string {
-  if (!m) return '—'
-  return m.utc ?? (m.jd != null ? `JD ${m.jd.toFixed(5)}` : '—')
+/** A value that may be an API moment (`{ jd, utc, unix }`) or a bare Julian Day. */
+export type MomentLike = Moment | number | null | undefined
+
+/** The Julian Day of a moment or a bare number; null when there is none. */
+export function momentJd(value: MomentLike): number | null {
+  const jd = typeof value === 'number' ? value : value?.jd
+  return typeof jd === 'number' && Number.isFinite(jd) ? jd : null
+}
+
+/** A Julian Day (UT) as `YYYY-MM-DD hh:mm:ss` in UTC, rounded to the nearest second. */
+export function jdToUtc(jd: number): string {
+  return julToDateTimeString(jd) || `JD ${jd.toFixed(5)}`
+}
+
+/** A moment as `YYYY-MM-DD hh:mm:ss` in UTC; `—` when there is none. */
+export function formatMoment(value: MomentLike): string {
+  const jd = momentJd(value)
+  return jd === null ? '—' : jdToUtc(jd)
 }
 
 export function round(value: number | null | undefined, places = 4): string {
@@ -10,21 +26,33 @@ export function round(value: number | null | undefined, places = 4): string {
   return value.toFixed(places)
 }
 
-const JD_UNIX_EPOCH = 2440587.5
-const MS_PER_DAY = 86_400_000
-
-/** A Julian Day (UT) as `YYYY-MM-DD HH:mm:ss` in UTC, rounded to the nearest second. */
-export function jdToUtc(jd: number): string {
-  const ms = Math.round(((jd - JD_UNIX_EPOCH) * MS_PER_DAY) / 1000) * 1000
-  const date = new Date(ms)
-  if (Number.isNaN(date.getTime())) return `JD ${jd.toFixed(5)}`
-  return date.toISOString().replace('T', ' ').replace('.000Z', '')
-}
-
 export type JdDisplayMode = 'utc' | 'jd'
 
 /** A Julian Day shown as UTC date-time or as the raw number; `—` when the event did not happen. */
-export function formatJd(jd: number | null | undefined, mode: JdDisplayMode = 'utc'): string {
-  if (jd === null || jd === undefined || Number.isNaN(jd)) return '—'
+export function formatJd(value: MomentLike, mode: JdDisplayMode = 'utc'): string {
+  const jd = momentJd(value)
+  if (jd === null) return '—'
   return mode === 'jd' ? jd.toFixed(5) : jdToUtc(jd)
+}
+
+export interface CoordColumns {
+  /** Field names of the two angles in a position, and of their speeds. */
+  first: string
+  second: string
+  firstLabel: string
+  secondLabel: string
+  /** Ecliptic longitudes are shown by zodiac sign; other angles as plain degrees. */
+  ecliptic: boolean
+}
+
+/** The fields a position carries for the coordinate system named in a response's `cs`. */
+export function coordColumns(cs: string | null | undefined): CoordColumns {
+  switch (cs) {
+    case 'equatorial':
+      return { first: 'ras', second: 'dcl', firstLabel: 'Right asc.', secondLabel: 'Declination', ecliptic: false }
+    case 'horizontal':
+      return { first: 'azi', second: 'alt', firstLabel: 'Azimuth', secondLabel: 'Altitude', ecliptic: false }
+    default:
+      return { first: 'lng', second: 'lat', firstLabel: 'Longitude', secondLabel: 'Latitude', ecliptic: true }
+  }
 }

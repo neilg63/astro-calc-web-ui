@@ -3,6 +3,8 @@ import { reactive } from 'vue'
 import { useEndpoint } from '../api/useEndpoint'
 import { CORE_BODY_KEYS } from '../stores/reference'
 import { aspectsParam, momentParams, useMomentForm } from '../lib/queryForms'
+import { PERSPECTIVES, perspectiveBodies, type PerspectiveKey } from '../lib/perspectives'
+import PerspectiveSelect from '../components/PerspectiveSelect.vue'
 import MomentFields from '../components/MomentFields.vue'
 import LocationFields from '../components/LocationFields.vue'
 import BodySelect from '../components/BodySelect.vue'
@@ -15,7 +17,9 @@ import type { AspectMatch, AspectTarget, BodyPosition } from '../api/types'
 const moment = useMomentForm()
 const prefs = usePreferencesStore()
 const bodies = reactive({ keys: [...CORE_BODY_KEYS] })
-const ps = reactive({ value: 'geo' as 'geo' | 'topo' })
+const ps = reactive({ value: (prefs.ps === 'local' ? 'topo' : prefs.ps) as PerspectiveKey })
+/** `/aspects` takes every perspective; local space would only repeat topocentric. */
+const ASPECT_PERSPECTIVES = PERSPECTIVES.map((p) => p.key).filter((key) => key !== 'local')
 const aspects = reactive<{ defs: AspectDef[] }>({ defs: prefs.aspects.map((a) => ({ ...a })) })
 
 interface AspectsResult {
@@ -30,7 +34,7 @@ const { data, error, loading, run, lastUrl } = useEndpoint<AspectsResult>('/aspe
 
 function submit() {
   run({
-    bodies: bodies.keys,
+    bodies: perspectiveBodies(bodies.keys, ps.value).keys,
     ...momentParams(moment),
     ps: ps.value,
     loc: ps.value === 'topo' ? prefs.loc : undefined,
@@ -47,12 +51,7 @@ function submit() {
   <div class="view-form box horizontal-form">
     <BodySelect v-model="bodies.keys" />
     <MomentFields :form="moment" />
-    <b-field label="Perspective" label-position="on-border">
-      <b-select size="is-small" v-model="ps.value">
-        <option value="geo">Geocentric</option>
-        <option value="topo">Topocentric</option>
-      </b-select>
-    </b-field>
+    <PerspectiveSelect v-model="ps.value" :allow="ASPECT_PERSPECTIVES" :bodies="bodies.keys" />
     <LocationFields v-if="ps.value === 'topo'" />
     <AspectOrbsEditor v-model="aspects.defs" />
     <b-button size="is-small" type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>

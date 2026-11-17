@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useEndpoint } from '../api/useEndpoint'
 import { useReferenceStore } from '../stores/reference'
 import { momentParams, useMomentForm, useViewForm, viewParams } from '../lib/queryForms'
@@ -8,7 +8,7 @@ import ViewFields from '../components/ViewFields.vue'
 import AyanamshaFields, { type AyanamshaFormValue } from '../components/AyanamshaFields.vue'
 import ResultPanel from '../components/ResultPanel.vue'
 import DegreeValue from '../components/DegreeValue.vue'
-import { round } from '../lib/format'
+import { coordColumns, round } from '../lib/format'
 import type { AyanamshaValue, BodyPosition, GeoJson } from '../api/types'
 
 const reference = useReferenceStore()
@@ -31,6 +31,8 @@ interface PositionResult {
 }
 
 const { data, error, loading, run, lastUrl } = useEndpoint<PositionResult>('/position')
+/** The angle columns follow the coordinate system of the response. */
+const cols = computed(() => coordColumns(data.value?.cs))
 
 function submit() {
   run({ body: body.key, ...momentParams(moment), ...viewParams(view), aya: aya.value.aya, sid: aya.value.sid ? 1 : undefined })
@@ -58,10 +60,13 @@ function submit() {
     <template #default="{ data: res }">
       <b-table :data="[(res as PositionResult).body]" striped narrowed>
         <b-table-column field="key" label="Body" v-slot="props">{{ props.row.key }}</b-table-column>
-        <b-table-column field="lng" label="Longitude" v-slot="props"><DegreeValue :value="props.row.lng" /></b-table-column>
-        <b-table-column field="lat" label="Latitude" v-slot="props">{{ round(props.row.lat) }}</b-table-column>
-        <b-table-column field="lng_speed" label="Lng speed" v-slot="props">{{ round(props.row.lng_speed) }}</b-table-column>
-        <b-table-column field="lat_speed" label="Lat speed" v-slot="props">{{ round(props.row.lat_speed) }}</b-table-column>
+        <b-table-column :field="cols.first" :label="cols.firstLabel" v-slot="props">
+          <DegreeValue v-if="cols.ecliptic" :value="props.row[cols.first]" />
+          <template v-else>{{ round(props.row[cols.first]) }}°</template>
+        </b-table-column>
+        <b-table-column :field="cols.second" :label="cols.secondLabel" v-slot="props">{{ round(props.row[cols.second]) }}</b-table-column>
+        <b-table-column :field="`${cols.first}_speed`" :label="`${cols.firstLabel} speed`" v-slot="props">{{ round(props.row[`${cols.first}_speed`]) }}</b-table-column>
+        <b-table-column :field="`${cols.second}_speed`" :label="`${cols.secondLabel} speed`" v-slot="props">{{ round(props.row[`${cols.second}_speed`]) }}</b-table-column>
         <b-table-column field="dist" label="Distance" v-slot="props">{{ round(props.row.dist, 6) }}</b-table-column>
         <b-table-column field="dist_speed" label="Dist speed" v-slot="props">{{ round(props.row.dist_speed, 6) }}</b-table-column>
       </b-table>

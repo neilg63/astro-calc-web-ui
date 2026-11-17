@@ -5,8 +5,9 @@ import { momentParams, rangeEndParams, useMomentForm, useRangeEndForm } from '..
 import MomentFields from '../components/MomentFields.vue'
 import RangeEndFields from '../components/RangeEndFields.vue'
 import BodySelect from '../components/BodySelect.vue'
+import UtcTime from '../components/UtcTime.vue'
 import ResultPanel from '../components/ResultPanel.vue'
-import { formatMoment, round } from '../lib/format'
+import { round } from '../lib/format'
 import type { StationsForBody } from '../api/types'
 
 const OUTER_PLANETS = ['me', 've', 'ma', 'ju', 'sa', 'ur', 'ne', 'pl']
@@ -63,7 +64,7 @@ function submit() {
         <b-table-column field="retrograde" label="Retrograde" v-slot="props">{{ props.row.retrograde ? 'yes' : 'no' }}</b-table-column>
         <b-table-column field="type" label="Station type" v-slot="props">{{ props.row.type }}</b-table-column>
         <b-table-column field="speed" label="Speed at station" v-slot="props">{{ round(props.row.speed) }}</b-table-column>
-        <b-table-column field="utc" label="When" v-slot="props">{{ formatMoment(props.row) }}</b-table-column>
+        <b-table-column field="utc" label="When" v-slot="props"><UtcTime :value="props.row" /></b-table-column>
       </b-table>
     </template>
   </ResultPanel>

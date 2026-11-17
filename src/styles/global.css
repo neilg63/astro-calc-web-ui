@@ -255,20 +255,6 @@
   margin-right: 0.5em;
 }
 
-#app .horizontal-form > .field .field > label {
-  font-size: 0.625em;
-  font-weight: normal;
-  color: var(--acw-border);
-  pointer-events: none;
-  opacity: 0.75;
-  text-align: left;
-  position: absolute;
-  left: -2.75em;
-  display: block;
-  padding:0;
-  top: -1.375em;
-  font-style: italic;
-}
 
 /* Bodies sit on a row of their own kind: after every other field, before the Run button. */
 #app .horizontal-form:has(> .body-select)::before {
@@ -339,30 +325,10 @@
   margin-bottom: 0.75rem;
 }
 
-#app .horizontal-form .view-fields > .field > label,
-#app .horizontal-form .view-fields > .field:not(.location-fields) .field > label {
+#app .horizontal-form .view-fields > .field > label {
   font-size: 0.75em;
   font-weight: normal;
   color: var(--acw-accent-2);
-}
-
-#app .horizontal-form .view-fields > .location-fields .field {
-  position: relative;
-}
-
-#app .horizontal-form .view-fields > .location-fields .field > label {
-  font-size: 0.625em;
-  font-weight: normal;
-  color: var(--acw-border);
-  pointer-events: none;
-  opacity: 0.75;
-  text-align: left;
-  position: absolute;
-  left: -2.75em;
-  display: block;
-  padding: 0;
-  top: -1.375em;
-  font-style: italic;
 }
 
 /* ---- Location: a narrow altitude box ---- */
@@ -383,4 +349,35 @@
 /* A number box that stands alone in the form row would otherwise collapse to its padding. */
 #app .horizontal-form .b-numberinput input {
   min-width: 4em;
+}
+
+/* Date-times: shown as YYYY-MM-DD hh:mm:ss in UTC; the tooltip says so. */
+.utc-time {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * Labels of the individual inputs (Buefy's "on-border" labels): a plain line of text
+ * directly above each box, in full, instead of a faint label floating over its border.
+ */
+#app .horizontal-form .field.is-floating-label > .label {
+  position: static;
+  display: block;
+  max-width: none;
+  margin: 0 0 0.2em;
+  padding: 0;
+  overflow: visible;
+  white-space: nowrap;
+  background: none;
+  font-size: 0.6875rem;
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1.2;
+  color: var(--acw-text-muted);
+  opacity: 1;
+}
+
+#app .horizontal-form .field.is-floating-label > .label::before {
+  display: none;
 }

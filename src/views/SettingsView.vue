@@ -1,10 +1,11 @@
 <script setup lang="ts">
+import PerspectiveSelect from '../components/PerspectiveSelect.vue'
 import { storeToRefs } from 'pinia'
 import { usePreferencesStore } from '../stores/preferences'
 import { useReferenceStore } from '../stores/reference'
 
 const prefs = usePreferencesStore()
-const { apiBase, tzOffsetHours, cs, ps, defaultOrb } = storeToRefs(prefs)
+const { apiBase, cs, ps, defaultOrb } = storeToRefs(prefs)
 
 const reference = useReferenceStore()
 const { loading: referenceLoading, error: referenceError } = storeToRefs(reference)
@@ -31,11 +32,6 @@ function resetPreferences() {
           </b-field>
         </div>
         <div class="column is-half">
-          <b-field horizontal label="UTC offset (h)">
-            <b-numberinput v-model="tzOffsetHours" :step="0.5" :min="-14" :max="14" :controls="false" size="is-small" />
-          </b-field>
-        </div>
-        <div class="column is-half">
           <b-field horizontal label="Default orb (°)">
             <b-numberinput v-model="defaultOrb" :step="0.5" :min="0.1" :controls="false" size="is-small" />
           </b-field>
@@ -50,12 +46,7 @@ function resetPreferences() {
           </b-field>
         </div>
         <div class="column is-half">
-          <b-field horizontal label="Perspective">
-            <b-select v-model="ps" size="is-small" expanded>
-              <option value="geo">Geocentric</option>
-              <option value="topo">Topocentric</option>
-            </b-select>
-          </b-field>
+          <PerspectiveSelect v-model="ps" horizontal />
         </div>
       </div>
 

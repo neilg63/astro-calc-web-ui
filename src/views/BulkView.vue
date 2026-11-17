@@ -8,9 +8,10 @@ import MomentFields from '../components/MomentFields.vue'
 import BodySelect from '../components/BodySelect.vue'
 import AyanamshaSelect from '../components/AyanamshaSelect.vue'
 import AspectOrbsEditor from '../components/AspectOrbsEditor.vue'
+import UtcTime from '../components/UtcTime.vue'
 import ResultPanel from '../components/ResultPanel.vue'
 import DegreeValue from '../components/DegreeValue.vue'
-import { formatMoment, round } from '../lib/format'
+import { round } from '../lib/format'
 import type { AspectTarget, BulkChart, BulkError, BulkLabel, BulkMatch } from '../api/types'
 
 type BulkKind = 'charts' | 'pairs' | 'one-to-many' | 'many-to-many'
@@ -75,7 +76,7 @@ interface BulkResult {
 const { data, error, loading, run, lastUrl } = useEndpoint<BulkResult>(PATHS.charts)
 
 const chartRows = computed(() =>
-  (data.value?.charts ?? []).flatMap((chart) => chart.bodies.map((body) => ({ ref: chart.ref, when: formatMoment(chart.date), engine: chart.engine, ...body }))),
+  (data.value?.charts ?? []).flatMap((chart) => chart.bodies.map((body) => ({ ref: chart.ref, when: chart.date, engine: chart.engine, ...body }))),
 )
 
 const matchRows = computed(() => {
@@ -174,14 +175,14 @@ function submit() {
           POST · {{ (res as BulkResult).ps }} · {{ (res as BulkResult).sidereal ? `sidereal (${(res as BulkResult).sidereal})` : 'tropical' }} ·
           {{ (res as BulkResult).count }} {{ (res as BulkResult).charts ? 'charts' : 'matches' }}
           <template v-if="(res as BulkResult).progressed">
-            · progressed to {{ formatMoment((res as BulkResult).progressed!.date) }} (A {{ (res as BulkResult).progressed!.a }}, B
+            · progressed to <UtcTime :value="(res as BulkResult).progressed!.date" /> (A {{ (res as BulkResult).progressed!.a }}, B
             {{ (res as BulkResult).progressed!.b }})
           </template>
         </p>
 
         <b-table v-if="(res as BulkResult).charts" :data="chartRows" striped narrowed paginated per-page="25" pagination-size="is-small">
           <b-table-column field="ref" label="Record" v-slot="props">{{ props.row.ref }}</b-table-column>
-          <b-table-column field="when" label="Date (UTC)" v-slot="props">{{ props.row.when }}</b-table-column>
+          <b-table-column field="when" label="Date (UTC)" v-slot="props"><UtcTime :value="props.row.when" /></b-table-column>
           <b-table-column field="key" label="Body" v-slot="props">{{ props.row.key }}</b-table-column>
           <b-table-column field="lng" label="Longitude" v-slot="props"><DegreeValue :value="props.row.lng" /></b-table-column>
           <b-table-column field="lat" label="Latitude" numeric v-slot="props">{{ round(props.row.lat) }}</b-table-column>

@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import type { PerspectiveKey } from '../lib/perspectives'
 
 const STORAGE_KEY = 'astro-calc-web-ui.preferences.v1'
 
@@ -7,14 +8,24 @@ export interface AspectDef {
   orb: number
 }
 
+/** The date-time last used in a form: "now", a date-time string (UTC) or a Julian Day. */
+export interface MomentChoice {
+  mode: 'now' | 'dt' | 'jd'
+  /** `YYYY-MM-DDThh:mm:ss`, read as UTC. */
+  dt: string
+  jd: number
+}
+
 export interface PreferencesState {
   apiBase: string
   lat: number
   lng: number
   alt: number
   tzOffsetHours: number
+  /** The date-time last used, shared by every page and kept between visits. */
+  moment: MomentChoice
   cs: 'ecl' | 'equ' | 'hor'
-  ps: 'geo' | 'topo'
+  ps: PerspectiveKey
   ayanamshas: string[]
   sidereal: boolean
   houseSystems: string[]
@@ -29,6 +40,7 @@ function defaults(): PreferencesState {
     lng: -0.1278,
     alt: 100,
     tzOffsetHours: 0,
+    moment: { mode: 'now', dt: '', jd: 2451545.0 },
     cs: 'ecl',
     ps: 'geo',
     ayanamshas: [],
@@ -56,7 +68,12 @@ function loadFromStorage(): Partial<PreferencesState> {
 }
 
 export const usePreferencesStore = defineStore('preferences', {
-  state: (): PreferencesState => ({ ...defaults(), ...loadFromStorage() }),
+  state: (): PreferencesState => {
+    const base = defaults()
+    const saved = loadFromStorage()
+    // `moment` is merged field by field so that stored preferences from before it existed still load.
+    return { ...base, ...saved, moment: { ...base.moment, ...(saved.moment ?? {}) } }
+  },
   getters: {
     /**
      * `lat,lng,alt` for the API. A cleared number box holds null, which must never reach the

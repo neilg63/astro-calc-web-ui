@@ -4,9 +4,10 @@ import { useEndpoint } from '../api/useEndpoint'
 import { momentParams, useMomentForm } from '../lib/queryForms'
 import MomentFields from '../components/MomentFields.vue'
 import LocationFields from '../components/LocationFields.vue'
+import UtcTime from '../components/UtcTime.vue'
 import ResultPanel from '../components/ResultPanel.vue'
 import { usePreferencesStore } from '../stores/preferences'
-import { formatMoment, round } from '../lib/format'
+import { round } from '../lib/format'
 import type { GeoJson, Moment } from '../api/types'
 
 const moment = useMomentForm()
@@ -40,9 +41,9 @@ const rows = computed(() => {
   if (!res) return []
   return [
     ['Kind', res.kind],
-    ['Rise', formatMoment(res.rise)],
-    ['Set', formatMoment(res.set)],
-    ['Next rise', formatMoment(res.next_rise)],
+    ['Rise (UTC)', res.rise],
+    ['Set (UTC)', res.set],
+    ['Next rise (UTC)', res.next_rise],
     ['Is day time', res.is_day_time ? 'yes' : 'no'],
     ['Day length (days)', round(res.day_length, 5)],
     ['Daylight length (days)', round(res.daylight_length, 5)],
@@ -78,7 +79,10 @@ function submit() {
     <template #default>
       <b-table :data="rows" striped narrowed>
         <b-table-column field="key" label="Field" v-slot="props">{{ props.row.key }}</b-table-column>
-        <b-table-column field="value" label="Value" v-slot="props">{{ props.row.value }}</b-table-column>
+        <b-table-column field="value" label="Value" v-slot="props">
+          <UtcTime v-if="typeof props.row.value === 'object'" :value="props.row.value" />
+          <template v-else>{{ props.row.value }}</template>
+        </b-table-column>
       </b-table>
     </template>
   </ResultPanel>

@@ -17,7 +17,7 @@ defineProps<{ form: RangeEndForm; label?: string }>()
     <b-field v-if="form.mode === 'days'" label="Days" label-position="on-border">
       <b-numberinput size="is-small" v-model="form.days" :min="0" :controls="false" />
     </b-field>
-    <b-field v-else-if="form.mode === 'dt2'" label="Local date-time" label-position="on-border">
+    <b-field v-else-if="form.mode === 'dt2'" label="Date-time (UTC)" label-position="on-border" title="Read as UTC (Universal Time), not local time">
       <b-input size="is-small" v-model="form.dt2" type="datetime-local" step="1" />
     </b-field>
     <b-field v-else-if="form.mode === 'jd2'" label="Julian Day (UT)" label-position="on-border">

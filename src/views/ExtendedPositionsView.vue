@@ -4,6 +4,7 @@ import { useEndpoint } from '../api/useEndpoint'
 import { CORE_BODY_KEYS, useReferenceStore } from '../stores/reference'
 import { momentParams, useMomentForm, useViewForm } from '../lib/queryForms'
 import { usePreferencesStore } from '../stores/preferences'
+import { EARTH_PERSPECTIVES } from '../lib/perspectives'
 import MomentFields from '../components/MomentFields.vue'
 import ViewFields from '../components/ViewFields.vue'
 import AyanamshaSelect from '../components/AyanamshaSelect.vue'
@@ -69,7 +70,7 @@ function submit() {
       <SingleBodySelect v-if="single" v-model="form.body" />
       <BodySelect v-else v-model="form.bodies" />
       <MomentFields :form="moment" />
-      <ViewFields :form="view" hide-cs location-required />
+      <ViewFields :form="view" hide-cs location-required :perspectives="EARTH_PERSPECTIVES" />
       <AyanamshaSelect v-model="form.aya" />
       <b-field>
         <b-checkbox size="is-small" v-model="form.speeds">Show speeds</b-checkbox>

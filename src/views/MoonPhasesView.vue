@@ -5,9 +5,10 @@ import { momentParams, rangeEndParams, useMomentForm, useRangeEndForm } from '..
 import MomentFields from '../components/MomentFields.vue'
 import RangeEndFields from '../components/RangeEndFields.vue'
 import LocationFields from '../components/LocationFields.vue'
+import UtcTime from '../components/UtcTime.vue'
 import ResultPanel from '../components/ResultPanel.vue'
 import { usePreferencesStore } from '../stores/preferences'
-import { formatMoment, round } from '../lib/format'
+import { round } from '../lib/format'
 import type { MoonPhaseEntry } from '../api/types'
 
 const moment = useMomentForm()
@@ -67,7 +68,7 @@ function submit() {
       <b-table :data="(res as MoonPhasesResult).phases" striped narrowed>
         <b-table-column field="phase" label="Phase" v-slot="props">{{ props.row.phase }}</b-table-column>
         <b-table-column field="num" label="#" v-slot="props">{{ props.row.num }}</b-table-column>
-        <b-table-column field="utc" label="When" v-slot="props">{{ formatMoment(props.row) }}</b-table-column>
+        <b-table-column field="utc" label="When" v-slot="props"><UtcTime :value="props.row" /></b-table-column>
       </b-table>
     </template>
   </ResultPanel>
