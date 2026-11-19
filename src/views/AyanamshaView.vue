@@ -7,7 +7,7 @@ import { momentParams, useMomentForm } from '../lib/queryForms'
 import MomentFields from '../components/MomentFields.vue'
 import ResultPanel from '../components/ResultPanel.vue'
 import AyanamshaFields, { type AyanamshaFormValue } from '../components/AyanamshaFields.vue'
-import { round } from '../lib/format'
+import { formatSignedDms } from '../lib/degrees'
 import type { AyanamshaValue } from '../api/types'
 
 const moment = useMomentForm()
@@ -38,7 +38,8 @@ function submit() {
     <template #default="{ data: res }">
       <b-table :data="orderAyanamshas((res as AyanamshaResult).ayanamshas)" striped narrowed>
         <b-table-column field="name" label="Ayanamsha" v-slot="props">{{ ayanamshaLabel(props.row.name) }}</b-table-column>
-        <b-table-column field="value" label="Value" v-slot="props">{{ round(props.row.value) }}</b-table-column>
+        <b-table-column field="value" label="DMS" numeric v-slot="props">{{ formatSignedDms(props.row.value) }}</b-table-column>
+        <b-table-column field="value" label="Degrees" numeric v-slot="props">{{ props.row.value.toFixed(5) }}</b-table-column>
       </b-table>
     </template>
   </ResultPanel>

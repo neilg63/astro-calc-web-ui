@@ -4,7 +4,7 @@ import { shownTimes, useTimeBasis } from '../lib/timeBasis'
 import { APPLIED_AYANAMSHA, appliedAyanamsha } from '../lib/zodiac'
 import { useReferenceStore } from '../stores/reference'
 
-const { prefs, offset, offsetLabel, mode, note } = useTimeBasis()
+const { choice, offset, offsetLabel, mode, note } = useTimeBasis()
 
 const props = defineProps<{ loading: boolean; error: string | null; data: unknown; lastUrl?: string }>()
 
@@ -25,7 +25,7 @@ provide(
     <template v-else-if="data">
       <div v-if="shownTimes > 0" class="time-basis">
         <b-field label="Show times as" label-position="on-border">
-          <b-select v-model="prefs.times" size="is-small">
+          <b-select v-model="choice" size="is-small">
             <option value="utc">UTC</option>
             <option value="local" :disabled="offset === null">{{ offset === null ? 'Local time (choose a place)' : `Local time, ${offsetLabel}` }}</option>
             <option value="jd">Julian Day</option>

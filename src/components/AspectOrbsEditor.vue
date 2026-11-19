@@ -50,7 +50,7 @@ function updateOrb(index: number, orb: number) {
           class="aspect-orbs-orb"
           :model-value="row.orb"
           @update:model-value="(v: number) => updateOrb(i, v)"
-          :step="0.5"
+          step="any"
           :min="0.1"
           :controls="false"
           size="is-small"

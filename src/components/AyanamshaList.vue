@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { formatFullDms } from '../lib/degrees'
+import { formatSignedDms } from '../lib/degrees'
 import { round } from '../lib/format'
 import { ayanamshaLabel } from '../lib/zodiac'
 
@@ -17,7 +17,7 @@ defineProps<{ ayanamshas: { key?: string | null; name: string; value: number }[]
     <dl class="points-list-items">
       <div v-for="a in ayanamshas" :key="a.key ?? a.name" class="points-list-item">
         <dt>{{ ayanamshaLabel(a.name) }}</dt>
-        <dd><b-tooltip :label="formatFullDms(a.value)" position="is-top" dashed>{{ round(a.value, 4) }}°</b-tooltip></dd>
+        <dd><b-tooltip :label="formatSignedDms(a.value)" position="is-top" dashed>{{ round(a.value, 4) }}°</b-tooltip></dd>
       </div>
     </dl>
   </div>

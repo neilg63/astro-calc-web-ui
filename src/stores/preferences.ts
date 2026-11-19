@@ -72,6 +72,8 @@ export interface PreferencesState {
   tzManual: boolean
   /** How result tables show times: UTC, local time at `tzOffset`, or Julian Day. */
   times: 'utc' | 'local' | 'jd'
+  /** Whether `times` was picked by the user; until then local time is shown when an offset is known. */
+  timesChosen: boolean
   tzOffsetHours: number
   /** The date-time last used, shared by every page and kept between visits. */
   moment: MomentChoice
@@ -101,6 +103,7 @@ function defaults(): PreferencesState {
     tzOffset: null,
     tzManual: false,
     times: 'utc',
+    timesChosen: false,
     tzOffsetHours: 0,
     moment: { mode: 'now', dt: '', jd: 2451545.0 },
     historic: { mode: 'dt', dt: '2000-01-01T12:00:00', jd: 2451545.0, lat: 51.5074, lng: -0.1278, alt: 100, place: null, tzOffset: null, tzManual: false },

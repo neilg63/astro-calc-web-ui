@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useAyanamshaKey } from '../lib/queryForms'
+import { ayanamshaApplies, useAyanamshaKey } from '../lib/queryForms'
 import { withBodySymbol } from '../lib/bodies'
 import RunButton from '../components/RunButton.vue'
 import { ayanamshaLabel } from '../lib/zodiac'
@@ -21,7 +21,7 @@ import type { AyanamshaValue, GeoJson, Moment } from '../api/types'
 const reference = useReferenceStore()
 const moment = useMomentForm()
 const view = useViewForm()
-const aya = useAyanamshaKey()
+const aya = useAyanamshaKey(() => view.ps)
 const form = reactive({
   bodies: [...CORE_BODY_KEYS],
   unit: 'days' as 'days' | 'years',
@@ -119,7 +119,7 @@ function submit() {
           <b-numberinput size="is-small" v-model="form.pd" :min="0.01" step="any" :controls="false" />
         </b-field>
       </b-field>
-      <AyanamshaSelect v-model="aya" />
+      <AyanamshaSelect v-if="ayanamshaApplies(view.ps)" v-model="aya" />
       <RunButton :loading="loading" @click="submit" />
     </div>
 

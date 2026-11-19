@@ -32,19 +32,19 @@ function changeMode(mode: HistoricChoice['mode']) {
     </b-field>
     <LocalTimeField v-if="form.mode === 'dt' && !hidePlace" :target="form" :form="form" />
     <b-field v-else-if="form.mode === 'jd'" label="Julian Day (UT)" label-position="on-border">
-      <b-numberinput size="is-small" v-model="form.jd" :step="0.5" :controls="false" />
+      <b-numberinput size="is-small" v-model="form.jd" step="any" :controls="false" />
     </b-field>
   </b-field>
   <b-field v-if="!hidePlace" class="historic-fields location-fields" label="Historic location" size="is-small" grouped group-multiline>
     <PlaceSearch :target="form" :moment="form" />
-    <b-field label="Latitude" label-position="on-border">
-      <b-numberinput v-model="form.lat" :step="0.0001" :min="-90" :max="90" :controls="false" size="is-small" />
+    <b-field class="location-latitude" label="Latitude" label-position="on-border">
+      <b-numberinput v-model="form.lat" step="any" :min="-90" :max="90" :controls="false" size="is-small" />
     </b-field>
-    <b-field label="Longitude" label-position="on-border">
-      <b-numberinput v-model="form.lng" :step="0.0001" :min="-180" :max="180" :controls="false" size="is-small" />
+    <b-field class="location-longitude" label="Longitude" label-position="on-border">
+      <b-numberinput v-model="form.lng" step="any" :min="-180" :max="180" :controls="false" size="is-small" />
     </b-field>
     <b-field class="location-altitude" label="Altitude (m)" label-position="on-border">
-      <b-numberinput v-model="form.alt" :step="1" :controls="false" size="is-small" />
+      <b-numberinput v-model="form.alt" step="any" :controls="false" size="is-small" />
     </b-field>
   </b-field>
 </template>

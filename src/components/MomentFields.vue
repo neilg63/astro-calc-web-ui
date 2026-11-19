@@ -40,7 +40,7 @@ function changeMode(mode: MomentForm['mode']) {
       <LocalTimeField :target="prefs" :form="form" />
     </template>
     <b-field v-else-if="form.mode === 'jd'" label="Julian Day (UT)" label-position="on-border">
-      <b-numberinput size="is-small" v-model="form.jd" :step="0.5" :controls="false" />
+      <b-numberinput size="is-small" v-model="form.jd" step="any" :controls="false" />
     </b-field>
   </b-field>
 </template>

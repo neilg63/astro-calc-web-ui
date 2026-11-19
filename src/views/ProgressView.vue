@@ -4,10 +4,12 @@ import RunButton from '../components/RunButton.vue'
 import { computed, reactive, ref, watch } from 'vue'
 import { useEndpoint } from '../api/useEndpoint'
 import { CORE_BODY_KEYS, useReferenceStore } from '../stores/reference'
-import { momentParams, useMomentForm, useViewForm, viewParams } from '../lib/queryForms'
+import { ayanamshaApplies, momentParams, useAyanamshaChoice, useMomentForm, useViewForm, viewParams } from '../lib/queryForms'
 import { observableBodies } from '../lib/perspectives'
 import MomentFields from '../components/MomentFields.vue'
 import ViewFields from '../components/ViewFields.vue'
+import AyanamshaFields from '../components/AyanamshaFields.vue'
+import AyanamshaList from '../components/AyanamshaList.vue'
 import BodySelect from '../components/BodySelect.vue'
 import UtcTime from '../components/UtcTime.vue'
 import ResultPanel from '../components/ResultPanel.vue'
@@ -18,8 +20,10 @@ import type { AyanamshaValue, GeoJson, Moment } from '../api/types'
 const reference = useReferenceStore()
 const moment = useMomentForm()
 const view = useViewForm()
+// The shared choice; tropical while the perspective is away from the Earth.
+const aya = useAyanamshaChoice(() => view.ps)
 const bodies = reactive({ keys: [...CORE_BODY_KEYS] })
-const span = reactive({ unit: 'days' as 'days' | 'years', amount: 7, pd: 1 })
+const span = reactive({ unit: 'days' as 'days' | 'years', amount: 15, pd: 2 })
 
 interface ProgressItem {
   lng: number
@@ -71,6 +75,8 @@ function submit() {
     bodies: observableBodies(bodies.keys, view.ps),
     ...momentParams(moment),
     ...viewParams(view),
+    aya: aya.value.aya,
+    sid: aya.value.sid ? 1 : undefined,
     pd: span.pd,
     days: span.unit === 'days' ? span.amount : undefined,
     years: span.unit === 'years' ? span.amount : undefined,
@@ -86,6 +92,7 @@ function submit() {
     <BodySelect v-model="bodies.keys" :perspective="view.ps" />
     <MomentFields :form="moment" label="Start" />
     <ViewFields :form="view" />
+    <AyanamshaFields v-if="ayanamshaApplies(view.ps)" v-model="aya" show-sidereal />
     <b-field grouped group-multiline>
       <b-field label="Span unit" label-position="on-border">
         <b-select size="is-small" v-model="span.unit">
@@ -105,6 +112,7 @@ function submit() {
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">
     <template #default>
+      <AyanamshaList :ayanamshas="(data as ProgressResult).ayanamshas" />
       <b-tabs v-model="activeTab" size="is-small" :animated="false" class="rise-sets-tabs">
         <b-tab-item v-for="body in (data as ProgressResult).bodies" :key="body.key" :label="withBodySymbol(body.key, bodyName(body.key))">
           <b-table :data="body.items" striped narrowed paginated per-page="100" class="jd-table">

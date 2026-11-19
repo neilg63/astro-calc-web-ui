@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useAyanamshaKey } from '../lib/queryForms'
+import { ayanamshaApplies, useAyanamshaKey } from '../lib/queryForms'
 import BodyKey from '../components/BodyKey.vue'
 import RunButton from '../components/RunButton.vue'
 import { ayanamshaLabel } from '../lib/zodiac'
@@ -18,7 +18,7 @@ import type { AyanamshaValue, BodyLongitude, GeoJson } from '../api/types'
 
 const moment = useMomentForm()
 const view = useViewForm()
-const aya = useAyanamshaKey()
+const aya = useAyanamshaKey(() => view.ps)
 const form = reactive({ bodies: ['as', 'su', 'mo', 'me', 've', 'ma', 'ju', 'sa', 'ur', 'ne', 'pl', 'ke', 'ra'] })
 
 interface LongitudesResult {
@@ -58,7 +58,7 @@ function submit() {
       <BodySelect v-model="form.bodies" :perspective="view.ps" />
       <MomentFields :form="moment" />
       <ViewFields :form="view" hide-cs />
-      <AyanamshaSelect v-model="aya" />
+      <AyanamshaSelect v-if="ayanamshaApplies(view.ps)" v-model="aya" />
       <RunButton :loading="loading" @click="submit" />
     </div>
 

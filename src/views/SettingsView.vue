@@ -32,7 +32,7 @@ function resetPreferences() {
         </div>
         <div class="column is-half">
           <b-field horizontal label="Default orb (°)">
-            <b-numberinput v-model="defaultOrb" :step="0.5" :min="0.1" :controls="false" size="is-small" />
+            <b-numberinput v-model="defaultOrb" step="any" :min="0.1" :controls="false" size="is-small" />
           </b-field>
         </div>
         <div class="column is-half">

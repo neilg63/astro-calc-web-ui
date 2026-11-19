@@ -30,12 +30,19 @@
  *                   .points-list (chart points as a horizontal definition list above a positions table;
  *                   -title, -items, -item, with .is-sidasc on the sidereal ascendant),
  *                   .ayanamsha-list (the response's ayanamsha values, in the same layout),
- *                   .longitude-progress-table, .is-retrograde (a longitude that is decreasing)
- *   Form components .moment-fields, .moment-mode (the Now / Date-time / Julian Day selector), .location-fields, .location-altitude, .view-fields,
+ *                   .longitude-progress-table, .is-retrograde (a longitude that is decreasing),
+ *                   .station-event (an event on Stations: .is-peak, .is-retro-start, .is-retro-peak,
+ *                   .is-retro-end; the start and end of a retrograde are italic and teal),
+ *                   tr.is-nearest (the Stations row nearest the moment, in bold);
+ *                   Stations rows also carry the event type (tr.is-retro-start …), italic at a retrograde's start and end
+ *   Form components .moment-fields, .moment-mode (the Now / Date-time / Julian Day selector), .location-fields, .location-latitude, .location-longitude (6em boxes),
+ *                   .location-altitude, .view-fields,
  *                   .place-search (place-name search; -name and -zone in its suggestions),
  *                   .local-time-field (the UTC date-time as clock time at the chosen place),
  *                   .utc-offset-field (its offset from UTC as ±hh:mm; .is-manual when typed by hand),
  *                   .span-amount, .span-per-unit (narrow number boxes on Progress),
+ *                   .listing-fields, .listing-mode, .listing-before (the range of the Stations listing;
+ *                   .is-manual when the days before were typed by hand),
  *                   .body-select, .historic-fields, .ayanamsha-fields, .house-system-select,
  *                   .tag-picker (the tag input inside .body-select),
  *                   .ayanamsha-fields-row,
@@ -424,6 +431,24 @@
   margin-bottom: 0.5em;
 }
 
+/* Stations: the event nearest the moment. */
+#app .view-stations tr.is-nearest td {
+  font-weight: 700;
+}
+
+/* Stations: the whole row is italic where a retrograde starts or ends. */
+#app .view-stations tr.is-retro-start td,
+#app .view-stations tr.is-retro-end td {
+  font-style: italic;
+}
+
+/* Stations: the turning points, where a retrograde starts and ends, stand out. */
+#app .station-event.is-retro-start,
+#app .station-event.is-retro-end {
+  font-style: italic;
+  color: var(--acw-accent);
+}
+
 #app .jd-table td {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -521,6 +546,25 @@
   white-space: nowrap;
 }
 
+/* ---- Location: latitude and longitude boxes, wide enough for five or six decimals ---- */
+
+#app .location-latitude,
+#app .location-longitude {
+  min-width: 0;
+  width: 6em;
+  max-width: 6em;
+}
+
+/* The box fills the field: 6em of the form's text size, not of its own smaller one. */
+#app .location-latitude .control,
+#app .horizontal-form .location-latitude .b-numberinput input,
+#app .location-longitude .control,
+#app .horizontal-form .location-longitude .b-numberinput input {
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+}
+
 /* ---- Progress: narrow boxes for the span and the records per day ---- */
 
 #app .span-amount,
@@ -535,6 +579,10 @@
 #app .horizontal-form .span-per-unit .b-numberinput input {
   min-width: 0;
   max-width: 3em;
+}
+
+#app .listing-before.is-manual input {
+  border-color: var(--acw-accent-2);
 }
 
 #app .span-amount > label,

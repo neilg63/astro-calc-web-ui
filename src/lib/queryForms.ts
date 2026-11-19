@@ -42,15 +42,28 @@ export interface AyanamshaChoice {
 }
 
 /**
+ * Whether an ayanamsha means anything from a perspective. The sidereal zodiacs are offsets
+ * of the Earth's equinox, so only an observer on the Earth has one; from any other centre
+ * longitudes are tropical.
+ */
+export function ayanamshaApplies(ps: PerspectiveKey): boolean {
+  return perspective(ps).earth
+}
+
+/**
  * The ayanamsha choice shared by every page that has one. Like the date-time and the
  * location, it lives in the preferences store, so it carries from page to page and is still
  * there on the next visit.
+ *
+ * Given the page's perspective, the choice reads as tropical while that perspective is away
+ * from the Earth. The stored choice is left alone meanwhile, so it applies again on return.
  */
-export function useAyanamshaChoice(): WritableComputedRef<AyanamshaChoice> {
+export function useAyanamshaChoice(ps?: () => PerspectiveKey): WritableComputedRef<AyanamshaChoice> {
   const prefs = usePreferencesStore()
   return computed({
-    get: () => ({ aya: prefs.ayanamshas, sid: prefs.sidereal }),
+    get: () => (ps && !ayanamshaApplies(ps()) ? { aya: [], sid: false } : { aya: prefs.ayanamshas, sid: prefs.sidereal }),
     set: (choice) => {
+      if (ps && !ayanamshaApplies(ps())) return
       prefs.ayanamshas = choice.aya
       prefs.sidereal = choice.aya.length > 0 && choice.sid
     },
@@ -60,13 +73,15 @@ export function useAyanamshaChoice(): WritableComputedRef<AyanamshaChoice> {
 /**
  * The same shared choice as one key, '' for tropical, for pages whose longitudes are always
  * sidereal once an ayanamsha is chosen. Leaving tropical turns the sidereal flag on, as the
- * ayanamsha fields do; changing from one ayanamsha to another leaves it as it was.
+ * ayanamsha fields do; changing from one ayanamsha to another leaves it as it was. Given the
+ * page's perspective, it is '' away from the Earth, as in `useAyanamshaChoice`.
  */
-export function useAyanamshaKey(): WritableComputedRef<string> {
+export function useAyanamshaKey(ps?: () => PerspectiveKey): WritableComputedRef<string> {
   const prefs = usePreferencesStore()
   return computed({
-    get: () => prefs.ayanamshas[0] ?? '',
+    get: () => (ps && !ayanamshaApplies(ps()) ? '' : (prefs.ayanamshas[0] ?? '')),
     set: (key) => {
+      if (ps && !ayanamshaApplies(ps())) return
       if (!key) {
         prefs.ayanamshas = []
         prefs.sidereal = false

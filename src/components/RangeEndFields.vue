@@ -21,7 +21,7 @@ defineProps<{ form: RangeEndForm; label?: string }>()
       <b-input size="is-small" v-model="form.dt2" type="datetime-local" step="1" />
     </b-field>
     <b-field v-else-if="form.mode === 'jd2'" label="Julian Day (UT)" label-position="on-border">
-      <b-numberinput size="is-small" v-model="form.jd2" :step="0.5" :controls="false" />
+      <b-numberinput size="is-small" v-model="form.jd2" step="any" :controls="false" />
     </b-field>
   </b-field>
 </template>

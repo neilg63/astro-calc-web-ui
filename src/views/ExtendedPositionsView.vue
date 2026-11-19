@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useAyanamshaKey } from '../lib/queryForms'
+import { ayanamshaApplies, useAyanamshaKey } from '../lib/queryForms'
 import BodyKey from '../components/BodyKey.vue'
 import RunButton from '../components/RunButton.vue'
 import { ayanamshaLabel } from '../lib/zodiac'
@@ -22,7 +22,7 @@ import type { Angles, AyanamshaValue, ExtendedBodyPosition, GeoJson } from '../a
 const prefs = usePreferencesStore()
 const moment = useMomentForm()
 const view = useViewForm()
-const aya = useAyanamshaKey()
+const aya = useAyanamshaKey(() => view.ps)
 const form = reactive({ bodies: [...CORE_BODY_KEYS], speeds: false })
 
 interface ExtendedResult {
@@ -68,7 +68,7 @@ function submit() {
       <BodySelect v-model="form.bodies" :perspective="view.ps" />
       <MomentFields :form="moment" />
       <ViewFields :form="view" hide-cs :location-required="onEarth" />
-      <AyanamshaSelect v-model="aya" />
+      <AyanamshaSelect v-if="ayanamshaApplies(view.ps)" v-model="aya" />
       <b-field>
         <b-checkbox size="is-small" v-model="form.speeds">Show speeds</b-checkbox>
       </b-field>
@@ -87,7 +87,7 @@ function submit() {
         </p>
         <PointsList v-if="(res as ExtendedResult).points" :points="(res as ExtendedResult).points!" :ayanamsha="(res as ExtendedResult).ayanamshas[0]" />
         <b-table :data="rows" striped narrowed scrollable>
-          <b-table-column field="key" label="Body" v-slot="props"><BodyKey :value="props.row.key" named /></b-table-column>
+          <b-table-column field="key" label="Body" v-slot="props"><BodyKey :value="props.row.key" /></b-table-column>
           <b-table-column field="lng" label="Longitude" v-slot="props"><DegreeValue :value="props.row.lng" /></b-table-column>
           <b-table-column field="lat" label="Latitude" numeric v-slot="props">{{ round(props.row.lat) }}</b-table-column>
           <b-table-column field="ras" label="Right asc." numeric v-slot="props">{{ round(props.row.ras) }}</b-table-column>

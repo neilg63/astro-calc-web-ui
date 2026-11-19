@@ -83,6 +83,16 @@ export function formatFullDms(value: number): string {
   return `${d.deg}° ${d.min}' ${d.sec}"`
 }
 
+/**
+ * An offset in degrees as DMS without wrapping into the circle, so a negative one keeps its
+ * sign: `24° 12' 51"`, `-3° 5' 0"`.
+ */
+export function formatSignedDms(value: number): string {
+  const total = Math.round(Math.abs(value) * ARCSECONDS_PER_DEGREE)
+  const sign = value < 0 && total > 0 ? '-' : ''
+  return `${sign}${Math.floor(total / ARCSECONDS_PER_DEGREE)}° ${Math.floor((total % ARCSECONDS_PER_DEGREE) / 60)}' ${total % 60}"`
+}
+
 export function formatDecimalDegrees(value: number, decimals = 4): string {
   return `${value.toFixed(decimals)}°`
 }

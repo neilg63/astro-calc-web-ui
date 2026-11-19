@@ -10,7 +10,7 @@ import { positionBodies } from '../lib/perspectives'
 import MomentFields from '../components/MomentFields.vue'
 import ViewFields from '../components/ViewFields.vue'
 import AyanamshaFields from '../components/AyanamshaFields.vue'
-import { useAyanamshaChoice } from '../lib/queryForms'
+import { ayanamshaApplies, useAyanamshaChoice } from '../lib/queryForms'
 import BodySelect from '../components/BodySelect.vue'
 import ResultPanel from '../components/ResultPanel.vue'
 import DegreeValue from '../components/DegreeValue.vue'
@@ -22,7 +22,7 @@ const moment = useMomentForm()
 const view = useViewForm()
 const bodies = reactive({ keys: [...CORE_BODY_KEYS] })
 // A ref, not a reactive object: the field replaces the whole value on every change.
-const aya = useAyanamshaChoice()
+const aya = useAyanamshaChoice(() => view.ps)
 
 interface PositionsResult {
   date: unknown
@@ -53,7 +53,7 @@ function submit() {
     <BodySelect v-model="bodies.keys" :perspective="view.ps" />
     <MomentFields :form="moment" />
     <ViewFields :form="view" />
-    <AyanamshaFields v-model="aya" show-sidereal />
+    <AyanamshaFields v-if="ayanamshaApplies(view.ps)" v-model="aya" show-sidereal />
     <RunButton :loading="loading" @click="submit" />
   </div>
 
