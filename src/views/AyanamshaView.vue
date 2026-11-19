@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import RunButton from '../components/RunButton.vue'
+import { ayanamshaLabel, orderAyanamshas } from '../lib/zodiac'
 import { ref } from 'vue'
 import { useEndpoint } from '../api/useEndpoint'
 import { momentParams, useMomentForm } from '../lib/queryForms'
@@ -26,17 +28,16 @@ function submit() {
 
 <template>
   <section class="view-page view-ayanamsha">
-  <h1 class="view-title title">Ayanamsha</h1>
   <div class="view-form box horizontal-form">
     <MomentFields :form="moment" />
     <AyanamshaFields v-model="selection" empty-label="All" />
-    <b-button size="is-small" type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
+    <RunButton :loading="loading" @click="submit" />
   </div>
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">
     <template #default="{ data: res }">
-      <b-table :data="(res as AyanamshaResult).ayanamshas" striped narrowed>
-        <b-table-column field="name" label="Ayanamsha" v-slot="props">{{ props.row.name }}</b-table-column>
+      <b-table :data="orderAyanamshas((res as AyanamshaResult).ayanamshas)" striped narrowed>
+        <b-table-column field="name" label="Ayanamsha" v-slot="props">{{ ayanamshaLabel(props.row.name) }}</b-table-column>
         <b-table-column field="value" label="Value" v-slot="props">{{ round(props.row.value) }}</b-table-column>
       </b-table>
     </template>

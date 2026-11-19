@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { withBodySymbol } from '../lib/bodies'
+import RunButton from '../components/RunButton.vue'
 import { reactive, ref, watch } from 'vue'
 import { useEndpoint } from '../api/useEndpoint'
 import { useReferenceStore } from '../stores/reference'
@@ -9,7 +11,7 @@ import BodySelect from '../components/BodySelect.vue'
 import UtcTime from '../components/UtcTime.vue'
 import ResultPanel from '../components/ResultPanel.vue'
 import { usePreferencesStore } from '../stores/preferences'
-import { round, type JdDisplayMode } from '../lib/format'
+import { round } from '../lib/format'
 import type { GeoJson, RiseSetDay, RiseSetDaysForBody, RiseSetOptionsJson } from '../api/types'
 
 const reference = useReferenceStore()
@@ -23,7 +25,6 @@ const form = reactive({
   refraction: '',
   twilight: '',
   hindu: false,
-  times: 'utc' as JdDisplayMode,
 })
 
 interface RiseSetsResult {
@@ -84,7 +85,6 @@ function submit() {
 
 <template>
   <section class="view-page view-rise-sets">
-    <h1 class="view-title title">Rise / Set by Day</h1>
     <p class="view-subtitle subtitle">Rise, set and meridian transits for each local day, with the altitude range. All times are UTC.</p>
 
     <div class="view-form box horizontal-form">
@@ -125,26 +125,20 @@ function submit() {
       <b-field>
         <b-checkbox size="is-small" v-model="form.hindu">Hindu rising</b-checkbox>
       </b-field>
-      <b-field label="Show times as" label-position="on-border">
-        <b-select size="is-small" v-model="form.times">
-          <option value="utc">UTC date-time</option>
-          <option value="jd">Julian Day</option>
-        </b-select>
-      </b-field>
-      <b-button size="is-small" type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
+      <RunButton :loading="loading" @click="submit" />
     </div>
 
     <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">
       <template #default="{ data: res }">
         <p class="result-summary">{{ optionsSummary((res as RiseSetsResult).options) }}</p>
         <b-tabs v-model="activeTab" size="is-small" :animated="false" class="rise-sets-tabs">
-          <b-tab-item v-for="body in (res as RiseSetsResult).bodies" :key="body.key" :label="bodyName(body.key)">
+          <b-tab-item v-for="body in (res as RiseSetsResult).bodies" :key="body.key" :label="withBodySymbol(body.key, bodyName(body.key))">
             <b-table :data="body.days" striped narrowed class="jd-table">
-              <b-table-column field="day_start" label="Day start" v-slot="props"><UtcTime :value="props.row.day_start" :mode="form.times" /></b-table-column>
-              <b-table-column field="rise" label="Rise" v-slot="props"><UtcTime :value="props.row.rise" :mode="form.times" /></b-table-column>
-              <b-table-column field="mc" label="MC (upper transit)" v-slot="props"><UtcTime :value="props.row.mc" :mode="form.times" /></b-table-column>
-              <b-table-column field="set" label="Set" v-slot="props"><UtcTime :value="props.row.set" :mode="form.times" /></b-table-column>
-              <b-table-column field="ic" label="IC (lower transit)" v-slot="props"><UtcTime :value="props.row.ic" :mode="form.times" /></b-table-column>
+              <b-table-column field="day_start" label="Day start" v-slot="props"><UtcTime :value="props.row.day_start" /></b-table-column>
+              <b-table-column field="rise" label="Rise" v-slot="props"><UtcTime :value="props.row.rise" /></b-table-column>
+              <b-table-column field="mc" label="MC (upper transit)" v-slot="props"><UtcTime :value="props.row.mc" /></b-table-column>
+              <b-table-column field="set" label="Set" v-slot="props"><UtcTime :value="props.row.set" /></b-table-column>
+              <b-table-column field="ic" label="IC (lower transit)" v-slot="props"><UtcTime :value="props.row.ic" /></b-table-column>
               <b-table-column field="alt_min" label="Alt min" numeric v-slot="props">{{ round(props.row.alt_min, 3) }}°</b-table-column>
               <b-table-column field="alt_max" label="Alt max" numeric v-slot="props">{{ round(props.row.alt_max, 3) }}°</b-table-column>
               <b-table-column label="Note" v-slot="props">

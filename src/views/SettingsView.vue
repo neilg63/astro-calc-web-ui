@@ -21,7 +21,6 @@ function resetPreferences() {
 
 <template>
   <section class="view-page view-settings">
-    <h1 class="view-title title">Settings</h1>
     <p class="view-subtitle subtitle">Preferences are saved to this browser's local storage.</p>
 
     <div class="settings-form view-form box">

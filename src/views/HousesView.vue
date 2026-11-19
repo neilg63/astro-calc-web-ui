@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import RunButton from '../components/RunButton.vue'
 import { reactive } from 'vue'
 import { useEndpoint } from '../api/useEndpoint'
 import { momentParams, useMomentForm } from '../lib/queryForms'
@@ -30,12 +31,11 @@ function submit() {
 
 <template>
   <section class="view-page view-houses">
-  <h1 class="view-title title">Houses</h1>
   <div class="view-form box horizontal-form">
     <MomentFields :form="moment" />
     <LocationFields />
     <HouseSystemSelect v-model="systems.codes" />
-    <b-button size="is-small" type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
+    <RunButton :loading="loading" @click="submit" />
   </div>
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">

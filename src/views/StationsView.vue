@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import BodyKey from '../components/BodyKey.vue'
+import RunButton from '../components/RunButton.vue'
 import { computed, reactive } from 'vue'
 import { useEndpoint } from '../api/useEndpoint'
 import { momentParams, rangeEndParams, useMomentForm, useRangeEndForm } from '../lib/queryForms'
@@ -38,7 +40,6 @@ function submit() {
 
 <template>
   <section class="view-page view-stations">
-  <h1 class="view-title title">Stations</h1>
   <p class="view-subtitle subtitle">Each body's current speed and its retrograde/direct stations.</p>
 
   <div class="view-form box horizontal-form">
@@ -53,13 +54,13 @@ function submit() {
         <b-numberinput size="is-small" v-model="opts.before" :min="0" :controls="false" />
       </b-field>
     </b-field>
-    <b-button size="is-small" type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
+    <RunButton :loading="loading" @click="submit" />
   </div>
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">
     <template #default>
-      <b-table :data="rows" striped narrowed paginated per-page="25">
-        <b-table-column field="key" label="Body" v-slot="props">{{ props.row.key }}</b-table-column>
+      <b-table :data="rows" striped narrowed paginated per-page="100">
+        <b-table-column field="key" label="Body" v-slot="props"><BodyKey :value="props.row.key" /></b-table-column>
         <b-table-column field="current_speed" label="Current speed" v-slot="props">{{ round(props.row.current_speed) }}</b-table-column>
         <b-table-column field="retrograde" label="Retrograde" v-slot="props">{{ props.row.retrograde ? 'yes' : 'no' }}</b-table-column>
         <b-table-column field="type" label="Station type" v-slot="props">{{ props.row.type }}</b-table-column>

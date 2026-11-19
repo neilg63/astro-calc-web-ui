@@ -12,7 +12,7 @@
  *
  * Class name map, by area:
  *   App shell      .app-navbar, .app-navbar-brand, .app-navbar-burger,
- *                   .app-navbar-title, .app-nav-menu, .app-nav-menu-item,
+ *                   .app-navbar-title, .app-navbar-page-title (the page's h1, after a divider), .app-nav-menu, .app-nav-menu-item,
  *                   .app-nav-backdrop, .app-main
  *   Every view      .view-page, .view-<route> (e.g. .view-positions),
  *                   .view-title, .view-subtitle, .view-form, .run-button
@@ -23,16 +23,29 @@
  *                   .result-panel-url, .result-panel-body,
  *                   .result-panel-raw-toggle, .result-panel-raw,
  *                   .result-summary (one-line caption above a table),
- *                   .jd-table (tables of date-times), .rise-sets-tabs
- *   Form components .moment-fields, .location-fields, .location-altitude, .view-fields,
- *                   .body-select, .ayanamsha-fields, .house-system-select,
+ *                   .time-basis (UTC / local / Julian Day selector above results that show times),
+ *                   .time-basis-note (says which, with the local offset; .is-local when local),
+ *                   .jd-table (tables of date-times), .rise-sets-tabs,
+ *                   .points-table, .points-columns (current and historic points side by side),
+ *                   .points-list (chart points as a horizontal definition list above a positions table;
+ *                   -title, -items, -item, with .is-sidasc on the sidereal ascendant),
+ *                   .ayanamsha-list (the response's ayanamsha values, in the same layout),
+ *                   .longitude-progress-table, .is-retrograde (a longitude that is decreasing)
+ *   Form components .moment-fields, .moment-mode (the Now / Date-time / Julian Day selector), .location-fields, .location-altitude, .view-fields,
+ *                   .place-search (place-name search; -name and -zone in its suggestions),
+ *                   .local-time-field (the UTC date-time as clock time at the chosen place),
+ *                   .utc-offset-field (its offset from UTC as ±hh:mm; .is-manual when typed by hand),
+ *                   .span-amount, .span-per-unit (narrow number boxes on Progress),
+ *                   .body-select, .historic-fields, .ayanamsha-fields, .house-system-select,
  *                   .tag-picker (the tag input inside .body-select),
  *                   .ayanamsha-fields-row,
- *                   .ayanamsha-fields-sidereal, .single-body-select, .ayanamsha-select, .bulk-records,
+ *                   .ayanamsha-fields-sidereal, .ayanamsha-select, .bulk-records,
  *                   .range-end-fields, .aspect-orbs-editor, .aspect-orbs-row,
  *                   .aspect-orbs-list, .aspect-orbs-name, .aspect-orbs-orb,
  *                   .aspect-orbs-remove, .aspect-orbs-add-row,
  *                   .aspect-orbs-select, .aspect-orbs-add
+ *   Bodies          .body-key (symbol + abbreviation, name as tooltip), .body-key-symbol,
+ *                   .body-key-abbr, .body-key-name
  *   Degree display  .degree-value (+ .degree-value-sign/-dms/-decimal for
  *                   the active mode) — the DegreeValue.vue component used
  *                   for ecliptic-longitude-like table cells; hover/focus
@@ -46,14 +59,69 @@
   --acw-surface-hover: #232323;
   --acw-border: #2c2c2c;
   --acw-text-muted: #aaa;
-  --acw-accent-2: #d1990b;
+  /* Labels, captions and the page title: the same teal as the main accent (was amber, #d1990b). */
+  --acw-accent-2: var(--acw-accent);
+  /* Action buttons (Calculate, add): light grey with dark content. */
+  --acw-button: #c8ccd0;
+  --acw-button-hover: #e3e6e8;
+  --acw-button-text: #16181a;
 }
 
 /* ---- App shell ---- */
 
+/*
+ * The bar stays at the top of the window while the page scrolls beneath it. Its height is
+ * one variable, so the content's top margin and the menu's height limit follow it.
+ */
+#app {
+  --acw-navbar-height: 3.25em;
+}
+
+#app .app-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  min-height: var(--acw-navbar-height);
+  height: var(--acw-navbar-height);
+}
+
+#app .app-navbar-brand {
+  min-height: var(--acw-navbar-height);
+  height: var(--acw-navbar-height);
+}
+
+#app .app-main {
+  margin-top: var(--acw-navbar-height);
+}
+
+/* The page title follows the app name in the bar, after a vertical divider. */
+#app .app-navbar-page-title {
+  align-self: center;
+  margin: 0;
+  padding-left: 0.75rem;
+  border-left: 1px solid var(--acw-text-muted);
+  font-size: 1em;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--acw-accent-2);
+  white-space: nowrap;
+}
+
 .app-navbar-burger {
   display: flex !important;
   margin-left: 0;
+}
+
+/* The burger's three bars. */
+#app .app-navbar-burger,
+#app .app-navbar-burger:hover {
+  color: yellow;
+}
+
+#app .app-navbar-burger span {
+  background-color: yellow;
 }
 
 .app-nav-menu {
@@ -65,7 +133,8 @@
   grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
   gap: 0.25rem;
   width: min(32rem, 100vw);
-  max-height: 70vh;
+  /* Never taller than the window below the bar: the menu scrolls inside itself. */
+  max-height: calc(100vh - var(--acw-navbar-height) - 1rem);
   overflow-y: auto;
   padding: 0.75rem;
   background: var(--acw-surface);
@@ -145,8 +214,45 @@
   margin-bottom: 1rem;
 }
 
-.run-button {
-  margin-top: 0.25rem;
+/* ---- Buttons: a light grey accent ---- */
+
+#app .button.is-primary {
+  background-color: var(--acw-button);
+  border-color: var(--acw-button);
+  color: var(--acw-button-text);
+}
+
+#app .button.is-primary:hover,
+#app .button.is-primary:focus-visible {
+  background-color: var(--acw-button-hover);
+  border-color: var(--acw-button-hover);
+  color: var(--acw-button-text);
+}
+
+#app .button.is-primary.is-outlined {
+  background-color: transparent;
+  color: var(--acw-button);
+}
+
+#app .button.is-primary.is-outlined:hover {
+  background-color: var(--acw-button);
+  color: var(--acw-button-text);
+}
+
+/* The Calculate button: a large play arrow, no label. */
+#app .run-button .button {
+  height: 1.875rem;
+  width: 2.75rem;
+  padding: 0;
+}
+
+#app .run-button .button .icon {
+  margin: 0;
+}
+
+#app .run-button .button .icon i::before {
+  font-size: 1.6rem;
+  line-height: 1;
 }
 
 /* ---- Settings ---- */
@@ -220,7 +326,8 @@
 }
 #app .view-page .subtitle,
 #app .view-home .subtitle {
-  font-size: 0.8em;
+  font-size: 0.75em;
+  margin-bottom: 0.25rem;
 }
 
 #app .view-page h1 {
@@ -234,16 +341,18 @@
   align-items: flex-end;
 }
 
-#app .horizontal-form .button.is-primary {
-  height: 1.75em;
+#app .horizontal-form .run-button {
   margin-bottom: 0.75em;
   margin-left: 0.5em;
 }
 
-#app .horizontal-form > .field > label {
-  font-size: 0.75em;
+/* Field-set labels (Start, Location, Bodies): small captions above a group of controls. */
+#app .horizontal-form > .field > label,
+#app .horizontal-form .location-fields > label {
+  font-size: 0.65em;
   font-weight: normal;
   color: var(--acw-accent-2);
+  margin-bottom: 0.25em;
 }
 
 #app .horizontal-form > .field .field,
@@ -256,7 +365,7 @@
 }
 
 
-/* Bodies sit on a row of their own kind: after every other field, before the Run button. */
+/* Bodies take the last row, filling it up to the Run button at the bottom right. */
 #app .horizontal-form:has(> .body-select)::before {
   content: '';
   flex-basis: 100%;
@@ -266,11 +375,13 @@
 #app .horizontal-form > .body-select {
   order: 2;
   flex: 1 1 18rem;
-  max-width: 40rem;
 }
 
+/* The Run button is anchored to the bottom right of the form. */
 #app .horizontal-form > .run-button {
   order: 3;
+  margin-left: auto;
+  align-self: flex-end;
 }
 
 .ayanamsha-fields-row {
@@ -284,6 +395,28 @@
 }
 
 /* ---- Result captions and date-time tables ---- */
+
+/* ---- Results: how times are shown ---- */
+
+#app .time-basis {
+  display: flex;
+  align-items: center;
+  gap: 0.75em;
+  margin-bottom: 0.75em;
+}
+
+#app .time-basis > .field {
+  margin-bottom: 0;
+}
+
+#app .time-basis-note {
+  font-size: 0.8em;
+  color: var(--acw-accent-2);
+}
+
+#app .time-basis-note.is-local {
+  font-weight: 600;
+}
 
 #app .result-summary {
   font-size: 0.8em;
@@ -326,9 +459,51 @@
 }
 
 #app .horizontal-form .view-fields > .field > label {
-  font-size: 0.75em;
+  font-size: 0.65em;
   font-weight: normal;
   color: var(--acw-accent-2);
+  margin-bottom: 0.25em;
+}
+
+/* ---- Location: place-name search ---- */
+
+#app .place-search {
+  width: 17rem;
+}
+
+/* The zone line sits below the box without making the form row taller. */
+#app .place-search > .help {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 0.1em;
+  white-space: nowrap;
+  font-size: 0.65em;
+  color: var(--acw-accent-2);
+}
+
+#app .place-search-zone {
+  margin-left: 0.75em;
+  font-size: 0.8em;
+  opacity: 0.65;
+}
+
+/* ---- Local time: a narrow box for the UTC offset ---- */
+
+#app .utc-offset-field,
+#app .utc-offset-field .control,
+#app .utc-offset-field input {
+  max-width: 5em;
+}
+
+#app .utc-offset-field > label {
+  max-width: none;
+  overflow: visible;
+  white-space: nowrap;
+}
+
+#app .utc-offset-field.is-manual input {
+  border-color: var(--acw-accent-2);
 }
 
 /* ---- Location: a narrow altitude box ---- */
@@ -341,6 +516,29 @@
 
 /* The label is wider than the box: let it run past the edge instead of being cut short. */
 #app .location-altitude > label {
+  max-width: none;
+  overflow: visible;
+  white-space: nowrap;
+}
+
+/* ---- Progress: narrow boxes for the span and the records per day ---- */
+
+#app .span-amount,
+#app .span-amount .control,
+#app .horizontal-form .span-amount .b-numberinput input {
+  min-width: 0;
+  max-width: 4em;
+}
+
+#app .span-per-unit,
+#app .span-per-unit .control,
+#app .horizontal-form .span-per-unit .b-numberinput input {
+  min-width: 0;
+  max-width: 3em;
+}
+
+#app .span-amount > label,
+#app .span-per-unit > label {
   max-width: none;
   overflow: visible;
   white-space: nowrap;
@@ -380,4 +578,100 @@
 
 #app .horizontal-form .field.is-floating-label > .label::before {
   display: none;
+}
+
+/* Chart points: a compact table, or two of them (current and historic) side by side. */
+#app .points-table {
+  max-width: 24rem;
+}
+
+#app .points-table .points-table-title {
+  font-size: 0.8em;
+  font-weight: 600;
+  color: var(--acw-accent-2);
+  margin-bottom: 0.25em;
+}
+
+/* Chart points above a positions table: label over value, side by side, wrapping. */
+#app .points-list {
+  margin-bottom: 0.75rem;
+}
+
+#app .points-list-title {
+  font-size: 0.7em;
+  font-weight: 600;
+  color: var(--acw-accent-2);
+  margin-bottom: 0.15em;
+}
+
+#app .points-list-items {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 0.4rem 1.25rem;
+  margin: 0;
+}
+
+#app .points-list-item dt {
+  font-size: 0.65em;
+  font-weight: normal;
+  color: var(--acw-accent-2);
+  white-space: nowrap;
+}
+
+#app .points-list-item dd {
+  margin: 0;
+  font-size: 0.85em;
+  white-space: nowrap;
+}
+
+/* One ayanamsha: heading, name and degrees on a single line. */
+#app .ayanamsha-list.is-single,
+#app .ayanamsha-list.is-single .points-list-item {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: baseline;
+  gap: 0 0.6em;
+}
+
+#app .ayanamsha-list.is-single .points-list-title {
+  margin-bottom: 0;
+}
+
+#app .points-list-item.is-sidasc dd {
+  font-weight: 600;
+}
+
+#app .points-columns {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 0 2rem;
+  margin-top: 1rem;
+}
+
+/* Longitude progress: one column per body. A retrograde longitude is marked. */
+#app .longitude-progress-table td {
+  white-space: nowrap;
+}
+
+#app .longitude-progress-table .is-retrograde {
+  color: var(--acw-accent-2);
+}
+
+/* ---- Bodies: symbol before the abbreviation ---- */
+
+#app .body-key {
+  white-space: nowrap;
+}
+
+#app .body-key-symbol {
+  display: inline-block;
+  min-width: 1.2em;
+  margin-right: 0.3em;
+  text-align: center;
+  color: var(--acw-accent-2);
+}
+
+/* The two-letter abbreviation is smaller than the symbol and the text around it. */
+#app .body-key-abbr {
+  font-size: 0.75em;
 }

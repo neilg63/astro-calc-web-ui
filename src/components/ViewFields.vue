@@ -11,8 +11,6 @@ const props = defineProps<{
   hideCs?: boolean
   /** The perspectives this endpoint accepts; all of them by default. */
   perspectives?: PerspectiveKey[]
-  /** The selected bodies, so that the perspective can say which of them it changes. */
-  bodies?: string[]
 }>()
 
 const ps = computed(() => perspective(props.form.ps))
@@ -34,7 +32,7 @@ watchEffect(() => {
           <option value="hor" :disabled="!ps.earth">Horizontal</option>
         </b-select>
       </b-field>
-      <PerspectiveSelect v-model="props.form.ps" :allow="perspectives" :bodies="bodies" />
+      <PerspectiveSelect v-model="props.form.ps" :allow="perspectives" />
       <b-field v-if="ps.earth && !needsLocation">
         <b-checkbox size="is-small" v-model="props.form.useLocation">Use my location</b-checkbox>
       </b-field>

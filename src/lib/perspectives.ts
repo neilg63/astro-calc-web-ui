@@ -14,9 +14,10 @@ export interface PerspectiveOption {
   centre?: string
 }
 
+/** Topocentric comes first: it is the default wherever an endpoint accepts it. */
 export const PERSPECTIVES: PerspectiveOption[] = [
-  { key: 'geo', name: 'Geocentric', observer: 'Centre of the Earth', earth: true, needsLocation: false },
   { key: 'topo', name: 'Topocentric', observer: "A place on the Earth's surface", earth: true, needsLocation: true },
+  { key: 'geo', name: 'Geocentric', observer: 'Centre of the Earth', earth: true, needsLocation: false },
   { key: 'local', name: 'Local space (horizon)', observer: 'A place on the Earth, with azimuth from north and altitude', earth: true, needsLocation: true },
   { key: 'helio', name: 'Heliocentric', observer: 'Centre of the Sun', earth: false, needsLocation: false, centre: 'su' },
   { key: 'seleno', name: 'Selenocentric', observer: 'Centre of the Moon', earth: false, needsLocation: false, centre: 'mo' },
@@ -29,7 +30,7 @@ export const PERSPECTIVES: PerspectiveOption[] = [
 ]
 
 /** The perspectives with an observer on the Earth, for endpoints that need horizontal coordinates. */
-export const EARTH_PERSPECTIVES: PerspectiveKey[] = ['geo', 'topo', 'local']
+export const EARTH_PERSPECTIVES: PerspectiveKey[] = ['topo', 'geo', 'local']
 
 /** Points that exist only as seen from the Earth: the lunar nodes and apsides, and the ascendant. */
 const EARTH_ONLY_BODIES = ['mn', 'ra', 'ms', 'ke', 'ml', 'ol', 'ia', 'ip', 'as']
@@ -48,13 +49,22 @@ export interface PerspectiveBodies {
 }
 
 /**
+ * The bodies of a positions request. From a place on the Earth's surface the ascendant (`as`)
+ * always leads the list, whether or not it was selected.
+ */
+export function positionBodies(selected: string[], key: string): string[] {
+  const keys = observableBodies(selected, key)
+  return perspective(key).needsLocation && !keys.includes('as') ? ['as', ...keys] : keys
+}
+
+/**
  * Adapts a selection of bodies to a perspective, as the API adapts its own default sets:
  * away from the Earth the centre itself and the Earth-only points are left out and the Earth
  * (`ea`) joins the list; on the Earth, the Earth is left out.
  */
 export function perspectiveBodies(selected: string[], key: string): PerspectiveBodies {
   const ps = perspective(key)
-  const hidden = ps.earth ? ['ea'] : [...EARTH_ONLY_BODIES, ...(ps.centre ? [ps.centre] : [])]
+  const hidden = hiddenBodies(key)
   const keys = selected.filter((k) => !hidden.includes(k))
   const dropped = selected.filter((k) => hidden.includes(k))
   const earthAdded = !ps.earth && keys.length > 0 && !keys.includes('ea')
@@ -64,4 +74,30 @@ export function perspectiveBodies(selected: string[], key: string): PerspectiveB
     keys.splice(after + 1, 0, 'ea')
   }
   return { keys, dropped, earthAdded }
+}
+
+/** The bodies a perspective cannot show: the Earth from the Earth; elsewhere the centre and the Earth-only points. */
+export function hiddenBodies(key: string): string[] {
+  const ps = perspective(key)
+  return ps.earth ? ['ea'] : [...EARTH_ONLY_BODIES, ...(ps.centre ? [ps.centre] : [])]
+}
+
+/** A selection without the bodies the perspective cannot show: what a request sends. */
+export function observableBodies(selected: string[], key: string): string[] {
+  const hidden = hiddenBodies(key)
+  return selected.filter((k) => !hidden.includes(k))
+}
+
+/**
+ * What a perspective did to a selection of bodies, as a line for the reader, such as
+ * "Sun is not observable and Earth is added." Empty when nothing changed.
+ */
+export function perspectiveNote(droppedNames: string[], earthAdded: boolean): string {
+  const parts = []
+  if (droppedNames.length) {
+    const list = droppedNames.length > 1 ? `${droppedNames.slice(0, -1).join(', ')} and ${droppedNames[droppedNames.length - 1]}` : droppedNames[0]
+    parts.push(`${list} ${droppedNames.length > 1 ? 'are' : 'is'} not observable`)
+  }
+  if (earthAdded) parts.push('Earth is added')
+  return parts.length ? `${parts.join(' and ')}.` : ''
 }

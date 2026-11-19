@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import RunButton from '../components/RunButton.vue'
 import { useEndpoint } from '../api/useEndpoint'
 import { momentParams, useMomentForm } from '../lib/queryForms'
 import MomentFields from '../components/MomentFields.vue'
@@ -6,7 +7,8 @@ import LocationFields from '../components/LocationFields.vue'
 import ResultPanel from '../components/ResultPanel.vue'
 import DegreeValue from '../components/DegreeValue.vue'
 import { usePreferencesStore } from '../stores/preferences'
-import type { GeoJson } from '../api/types'
+import PointsTable from '../components/PointsTable.vue'
+import type { Angles, GeoJson } from '../api/types'
 
 const moment = useMomentForm()
 const prefs = usePreferencesStore()
@@ -14,7 +16,9 @@ const prefs = usePreferencesStore()
 interface AscendantResult {
   date: unknown
   geo: GeoJson
+  /** Deprecated in the API: the same value as `points.ascendant`. */
   ascendant: number
+  points?: Angles
 }
 
 const { data, error, loading, run, lastUrl } = useEndpoint<AscendantResult>('/ascendant')
@@ -26,16 +30,16 @@ function submit() {
 
 <template>
   <section class="view-page view-ascendant">
-  <h1 class="view-title title">Ascendant</h1>
   <div class="view-form box horizontal-form">
     <MomentFields :form="moment" />
     <LocationFields />
-    <b-button size="is-small" type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
+    <RunButton :loading="loading" @click="submit" />
   </div>
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">
     <template #default="{ data: res }">
-      <p class="title is-4"><DegreeValue :value="(res as AscendantResult).ascendant" /></p>
+      <p class="title is-4"><DegreeValue :value="(res as AscendantResult).points?.ascendant ?? (res as AscendantResult).ascendant" /></p>
+      <PointsTable v-if="(res as AscendantResult).points" :points="(res as AscendantResult).points!" />
     </template>
   </ResultPanel>
   </section>

@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import { computed, watchEffect } from 'vue'
-import { PERSPECTIVES, perspective, perspectiveBodies, type PerspectiveKey } from '../lib/perspectives'
-import { useReferenceStore } from '../stores/reference'
+import { PERSPECTIVES, perspective, type PerspectiveKey } from '../lib/perspectives'
 
 /**
- * The perspective dropdown. `allow` limits it to the perspectives an endpoint accepts.
- * Given the selected `bodies`, it notes which of them the perspective changes.
+ * The perspective dropdown. `allow` limits it to the perspectives an endpoint accepts. What the
+ * perspective does to the selected bodies is noted under the bodies list (`BodySelect`).
  */
-const props = defineProps<{ modelValue: PerspectiveKey; allow?: PerspectiveKey[]; bodies?: string[]; horizontal?: boolean }>()
+const props = defineProps<{ modelValue: PerspectiveKey; allow?: PerspectiveKey[]; horizontal?: boolean }>()
 const emit = defineEmits<{ 'update:modelValue': [PerspectiveKey] }>()
-const reference = useReferenceStore()
 
 const options = computed(() => PERSPECTIVES.filter((p) => !props.allow || props.allow.includes(p.key)))
 const onEarth = computed(() => options.value.filter((p) => p.earth))
@@ -20,23 +18,10 @@ watchEffect(() => {
   const first = options.value[0]
   if (first && !options.value.some((p) => p.key === props.modelValue)) emit('update:modelValue', first.key)
 })
-
-function bodyName(key: string): string {
-  return reference.bodies.find((b) => b.key === key)?.name ?? key
-}
-
-const note = computed(() => {
-  if (!props.bodies) return ''
-  const { dropped, earthAdded } = perspectiveBodies(props.bodies, props.modelValue)
-  const parts = []
-  if (dropped.length) parts.push(`not observable, left out: ${dropped.map(bodyName).join(', ')}`)
-  if (earthAdded) parts.push('Earth added')
-  return parts.length ? `${perspective(props.modelValue).name}: ${parts.join('; ')}.` : ''
-})
 </script>
 
 <template>
-  <b-field class="perspective-select" label="Perspective" :label-position="horizontal ? undefined : 'on-border'" :horizontal="horizontal" :message="note">
+  <b-field class="perspective-select" label="Perspective" :label-position="horizontal ? undefined : 'on-border'" :horizontal="horizontal">
     <b-select size="is-small" :model-value="modelValue" :expanded="horizontal" :title="perspective(modelValue).observer" @update:model-value="(v: PerspectiveKey) => emit('update:modelValue', v)">
       <optgroup v-if="onEarth.length" label="On the Earth">
         <option v-for="p in onEarth" :key="p.key" :value="p.key" :title="p.observer">{{ p.name }}</option>

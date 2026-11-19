@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ayanamshaLabel } from '../lib/zodiac'
 import { computed, onMounted } from 'vue'
 import { useReferenceStore } from '../stores/reference'
 
@@ -22,8 +23,12 @@ onMounted(() => reference.loadAll())
 
 const selected = computed({
   get: () => props.modelValue.aya[0] ?? '',
-  // Going back to tropical also clears the sidereal flag, which needs an ayanamsha.
-  set: (key: string) => emit('update:modelValue', key ? { ...props.modelValue, aya: [key] } : { aya: [], sid: false }),
+  // Leaving tropical turns sidereal longitudes on; going back clears the flag, which needs an
+  // ayanamsha. Changing from one ayanamsha to another keeps the flag as it was set.
+  set: (key: string) => {
+    if (!key) emit('update:modelValue', { aya: [], sid: false })
+    else emit('update:modelValue', { aya: [key], sid: props.modelValue.aya.length ? props.modelValue.sid : true })
+  },
 })
 
 const sidereal = computed({
@@ -37,9 +42,11 @@ const sidereal = computed({
     <div class="ayanamsha-fields-row">
       <b-select v-model="selected" size="is-small">
         <option value="">{{ emptyLabel ?? 'Tropical' }}</option>
-        <option v-for="a in reference.ayanamshas" :key="a.key" :value="a.key">{{ a.name.replace(/_/g, ' ') }}</option>
+        <option v-for="a in reference.ayanamshas" :key="a.key" :value="a.key">{{ ayanamshaLabel(a.name) }}</option>
       </b-select>
-      <b-checkbox v-if="showSidereal && selected" size="is-small" v-model="sidereal" class="ayanamsha-fields-sidereal">Sidereal</b-checkbox>
+      <b-tooltip v-if="showSidereal && selected" label="Show sidereal longitudes" position="is-top" class="ayanamsha-fields-sidereal">
+        <b-checkbox size="is-small" v-model="sidereal">Sidereal</b-checkbox>
+      </b-tooltip>
     </div>
   </b-field>
 </template>

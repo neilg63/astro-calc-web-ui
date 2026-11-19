@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import BodyKey from '../components/BodyKey.vue'
+import RunButton from '../components/RunButton.vue'
 import { reactive } from 'vue'
 import { useEndpoint } from '../api/useEndpoint'
 import { momentParams, useMomentForm } from '../lib/queryForms'
@@ -27,19 +29,18 @@ function submit() {
 
 <template>
   <section class="view-page view-pheno">
-  <h1 class="view-title title">Phenomena</h1>
   <p class="view-subtitle subtitle">Phase, elongation, apparent diameter and magnitude of each body.</p>
 
   <div class="view-form box horizontal-form">
     <BodySelect v-model="bodies.keys" />
     <MomentFields :form="moment" />
-    <b-button size="is-small" type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
+    <RunButton :loading="loading" @click="submit" />
   </div>
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">
     <template #default="{ data: res }">
       <b-table :data="(res as PhenoResult).bodies" striped narrowed>
-        <b-table-column field="key" label="Body" v-slot="props">{{ props.row.key }}</b-table-column>
+        <b-table-column field="key" label="Body" v-slot="props"><BodyKey :value="props.row.key" /></b-table-column>
         <b-table-column field="phase_angle" label="Phase angle" v-slot="props">{{ round(props.row.phase_angle) }}</b-table-column>
         <b-table-column field="illuminated" label="Illuminated" v-slot="props">{{ round(props.row.illuminated, 3) }}</b-table-column>
         <b-table-column field="elongation" label="Elongation" v-slot="props">{{ round(props.row.elongation) }}</b-table-column>

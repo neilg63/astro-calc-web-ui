@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { createApiClient } from '../api/client'
 import type { BodyRef, StarRef } from '../api/types'
 import { usePreferencesStore } from './preferences'
+import { orderAyanamshas } from '../lib/zodiac'
 
 export interface HouseSystemRef {
   code: string
@@ -35,9 +36,15 @@ export const useReferenceStore = defineStore('reference', {
     loading: false,
     error: null,
   }),
+  getters: {
+    /** The API's name of an ayanamsha given its key (or its name); the value itself if unknown. */
+    ayanamshaName: (state) => (keyOrName: string) => state.ayanamshas.find((a) => a.key === keyOrName || a.name === keyOrName)?.name ?? keyOrName,
+  },
   actions: {
     async loadAll(force = false) {
       if (this.loaded && !force) return
+      // Many components ask at once as a page mounts: one request in flight is enough.
+      if (this.loading && !force) return
       this.loading = true
       this.error = null
       try {
@@ -51,9 +58,11 @@ export const useReferenceStore = defineStore('reference', {
         ])
         this.bodies = bodiesRes.data.bodies ?? []
         this.stars = starsRes.data.stars ?? []
-        this.ayanamshas = (ayaRes.data.ayanamshas ?? [])
-          .filter((a: { key: string | null }) => a.key)
-          .map((a: { key: string; name: string }) => ({ key: a.key, name: a.name }))
+        this.ayanamshas = orderAyanamshas(
+          (ayaRes.data.ayanamshas ?? [])
+            .filter((a: { key: string | null }) => a.key)
+            .map((a: { key: string; name: string }): AyanamshaRef => ({ key: a.key, name: a.name })),
+        )
         this.houseSystems = (housesRes.data.sets ?? []).map((s: { system: string; name: string }) => ({ code: s.system, name: s.name }))
         this.loaded = true
       } catch (err) {

@@ -26,13 +26,17 @@ export function round(value: number | null | undefined, places = 4): string {
   return value.toFixed(places)
 }
 
-export type JdDisplayMode = 'utc' | 'jd'
+export type JdDisplayMode = 'utc' | 'local' | 'jd'
 
-/** A Julian Day shown as UTC date-time or as the raw number; `—` when the event did not happen. */
-export function formatJd(value: MomentLike, mode: JdDisplayMode = 'utc'): string {
+/**
+ * A Julian Day shown as UTC date-time, as clock time `tzOffset` seconds east of UTC, or as
+ * the raw number; `—` when the event did not happen.
+ */
+export function formatJd(value: MomentLike, mode: JdDisplayMode = 'utc', tzOffset = 0): string {
   const jd = momentJd(value)
   if (jd === null) return '—'
-  return mode === 'jd' ? jd.toFixed(5) : jdToUtc(jd)
+  if (mode === 'jd') return jd.toFixed(5)
+  return mode === 'local' ? julToDateTimeString(jd, tzOffset) || jdToUtc(jd) : jdToUtc(jd)
 }
 
 export interface CoordColumns {

@@ -69,6 +69,15 @@ export function formatSignDms(value: number): string {
   return `${p.deg} ${p.signSymbol} ${p.min}' ${p.sec}"`
 }
 
+/**
+ * The hover text of a longitude: sign name, full-circle DMS, decimal degrees and the zodiac it
+ * is measured in, e.g. `Capricorn: 279° 51' 23" | 279.8564° tropical`. `ayanamsha` is the
+ * name of the one applied, or null for tropical.
+ */
+export function formatLongitudeTooltip(value: number, ayanamsha: string | null = null, decimals = 4): string {
+  return `${signPosition(value).signName}: ${formatFullDms(value)} | ${formatDecimalDegrees(value, decimals)} ${ayanamsha || 'tropical'}`
+}
+
 export function formatFullDms(value: number): string {
   const d = fullDms(value)
   return `${d.deg}° ${d.min}' ${d.sec}"`

@@ -1,26 +1,25 @@
 <script setup lang="ts">
+import { useAyanamshaKey } from '../lib/queryForms'
+import BodyKey from '../components/BodyKey.vue'
+import RunButton from '../components/RunButton.vue'
+import { ayanamshaLabel } from '../lib/zodiac'
 import { computed, reactive } from 'vue'
 import { useEndpoint } from '../api/useEndpoint'
-import { useReferenceStore } from '../stores/reference'
 import { momentParams, useMomentForm, useViewForm, viewLocation } from '../lib/queryForms'
-import { perspectiveBodies } from '../lib/perspectives'
+import { observableBodies } from '../lib/perspectives'
 import MomentFields from '../components/MomentFields.vue'
 import ViewFields from '../components/ViewFields.vue'
 import AyanamshaSelect from '../components/AyanamshaSelect.vue'
 import BodySelect from '../components/BodySelect.vue'
-import SingleBodySelect from '../components/SingleBodySelect.vue'
 import ResultPanel from '../components/ResultPanel.vue'
 import DegreeValue from '../components/DegreeValue.vue'
 import { round } from '../lib/format'
 import type { AyanamshaValue, BodyLongitude, GeoJson } from '../api/types'
 
-/** `/longitude` (one body) when `single`, else `/longitudes`. */
-const props = defineProps<{ single?: boolean }>()
-
-const reference = useReferenceStore()
 const moment = useMomentForm()
 const view = useViewForm()
-const form = reactive({ body: 'su', bodies: ['as', 'su', 'mo', 'me', 've', 'ma', 'ju', 'sa', 'ur', 'ne', 'pl', 'ke', 'ra'], aya: '' })
+const aya = useAyanamshaKey()
+const form = reactive({ bodies: ['as', 'su', 'mo', 'me', 've', 'ma', 'ju', 'sa', 'ur', 'ne', 'pl', 'ke', 'ra'] })
 
 interface LongitudesResult {
   date: unknown
@@ -28,54 +27,39 @@ interface LongitudesResult {
   ps: string
   sidereal: boolean
   ayanamsha: AyanamshaValue | null
-  /** `/longitudes` */
-  longitudes?: BodyLongitude[]
-  /** `/longitude` */
-  key?: string
-  lng?: number
-  engine?: string
+  longitudes: BodyLongitude[]
 }
 
-const { data, error, loading, run, lastUrl } = useEndpoint<LongitudesResult>(props.single ? '/longitude' : '/longitudes')
+const { data, error, loading, run, lastUrl } = useEndpoint<LongitudesResult>('/longitudes')
 
-const rows = computed<BodyLongitude[]>(() => {
-  const res = data.value
-  if (!res) return []
-  if (res.longitudes) return res.longitudes
-  return res.key !== undefined && res.lng !== undefined ? [{ key: res.key, lng: res.lng }] : []
-})
+const rows = computed<BodyLongitude[]>(() => data.value?.longitudes ?? [])
 
-function bodyName(key: string): string {
-  return reference.bodies.find((b) => b.key === key)?.name ?? key
-}
 
 function submit() {
   // Without a place the ascendant cannot be calculated, and naming it is an error.
   const loc = viewLocation(view)
   // The ascendant needs a place.
-  const keys = perspectiveBodies(form.bodies, view.ps).keys.filter((k) => loc || k !== 'as')
+  const keys = observableBodies(form.bodies, view.ps).filter((k) => loc || k !== 'as')
   run({
-    ...(props.single ? { body: form.body } : { bodies: keys }),
+    bodies: keys,
     ...momentParams(moment),
     ps: view.ps,
     loc,
-    aya: form.aya,
+    aya: aya.value,
   })
 }
 </script>
 
 <template>
-  <section class="view-page" :class="single ? 'view-longitude' : 'view-longitudes'">
-    <h1 class="view-title title">{{ single ? 'Longitude' : 'Longitudes' }}</h1>
+  <section class="view-page view-longitudes">
     <p class="view-subtitle subtitle">Ecliptic longitude only: about half the cost of full positions.</p>
 
     <div class="view-form box horizontal-form">
-      <SingleBodySelect v-if="single" v-model="form.body" />
-      <BodySelect v-else v-model="form.bodies" />
+      <BodySelect v-model="form.bodies" :perspective="view.ps" />
       <MomentFields :form="moment" />
-      <ViewFields :form="view" hide-cs :bodies="single ? undefined : form.bodies" />
-      <AyanamshaSelect v-model="form.aya" />
-      <b-button size="is-small" type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
+      <ViewFields :form="view" hide-cs />
+      <AyanamshaSelect v-model="aya" />
+      <RunButton :loading="loading" @click="submit" />
     </div>
 
     <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">
@@ -83,13 +67,12 @@ function submit() {
         <p class="result-summary">
           {{ (res as LongitudesResult).ps }} ·
           <template v-if="(res as LongitudesResult).ayanamsha">
-            sidereal ({{ (res as LongitudesResult).ayanamsha!.name }}, {{ round((res as LongitudesResult).ayanamsha!.value, 4) }}°)
+            sidereal ({{ ayanamshaLabel((res as LongitudesResult).ayanamsha!.name) }}, {{ round((res as LongitudesResult).ayanamsha!.value, 4) }}°)
           </template>
           <template v-else>tropical</template>
-          <template v-if="(res as LongitudesResult).engine"> · engine: {{ (res as LongitudesResult).engine }}</template>
         </p>
         <b-table :data="rows" striped narrowed>
-          <b-table-column field="key" label="Body" v-slot="props">{{ bodyName(props.row.key) }} ({{ props.row.key }})</b-table-column>
+          <b-table-column field="key" label="Body" v-slot="props"><BodyKey :value="props.row.key" named /></b-table-column>
           <b-table-column field="lng" label="Longitude" v-slot="props"><DegreeValue :value="props.row.lng" /></b-table-column>
           <b-table-column field="lng" label="Decimal" numeric v-slot="props">{{ round(props.row.lng, 6) }}</b-table-column>
         </b-table>

@@ -13,6 +13,7 @@ const navOpen = ref(false)
         <span /><span /><span />
       </a>
       <RouterLink class="app-navbar-title navbar-item" to="/" @click="navOpen = false"><strong>AstroCalc Demo</strong></RouterLink>
+      <h1 v-if="$route.name !== 'home' && $route.meta.label" class="app-navbar-page-title view-title">{{ $route.meta.label }}</h1>
     </div>
     <div class="app-nav-menu" v-show="navOpen" @click="navOpen = false">
       <RouterLink v-for="l in ALL_LINKS" :key="l.to" class="app-nav-menu-item" :to="l.to">

@@ -132,12 +132,13 @@ export interface BodyLongitude {
 export interface ExtendedBodyPosition extends BodyPosition {
   ras: number
   dcl: number
-  azi: number
-  alt: number
+  /** Azimuth and altitude are null from a centre away from the Earth, where there is no horizon. */
+  azi: number | null
+  alt: number | null
   ras_speed: number
   dcl_speed: number
-  azi_speed: number
-  alt_speed: number
+  azi_speed: number | null
+  alt_speed: number | null
 }
 
 /** One local day of `/rise-sets`. Times are Julian Days (UT); `null` when the event does not happen that day. */
@@ -205,4 +206,28 @@ export interface BulkError {
   ref?: string | null
   index?: number
   error: string
+}
+
+/** A transposed point of `/transposed-positions`: `key` is `tp:` and the source body's key. */
+export interface TransposedPosition extends ExtendedBodyPosition {
+  source: string
+}
+
+export interface TransposedTransitsForBody {
+  key: string
+  source: string
+  lng: number
+  lat: number
+  days: RiseSetDay[]
+}
+
+/** The head shared by the transposed endpoints. The points are given in the topocentric view only. */
+export interface TransposedHead {
+  date: Moment
+  geo: GeoJson
+  historic_date: Moment
+  historic_geo: GeoJson | null
+  ps: string
+  points?: Angles
+  historic_points?: Angles
 }

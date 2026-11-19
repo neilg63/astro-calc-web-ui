@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import BodyKey from '../components/BodyKey.vue'
+import RunButton from '../components/RunButton.vue'
 import { reactive } from 'vue'
 import { useEndpoint } from '../api/useEndpoint'
 import { momentParams, useMomentForm } from '../lib/queryForms'
@@ -31,7 +33,6 @@ function submit() {
 
 <template>
   <section class="view-page view-rise-set">
-  <h1 class="view-title title">Rise / Set</h1>
   <div class="view-form box horizontal-form">
     <BodySelect v-model="bodies.keys" />
     <MomentFields :form="moment" />
@@ -39,13 +40,13 @@ function submit() {
     <b-field label="Mode (disc alignment / refraction)" label-position="on-border">
       <b-numberinput size="is-small" v-model="mode.value" :min="0" :max="7" :controls="false" />
     </b-field>
-    <b-button size="is-small" type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
+    <RunButton :loading="loading" @click="submit" />
   </div>
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">
     <template #default="{ data: res }">
       <b-table :data="(res as RiseSetResult).bodies" striped narrowed>
-        <b-table-column field="key" label="Body" v-slot="props">{{ props.row.key }}</b-table-column>
+        <b-table-column field="key" label="Body" v-slot="props"><BodyKey :value="props.row.key" /></b-table-column>
         <b-table-column field="prev_set" label="Prev set" v-slot="props"><UtcTime :value="props.row.prev_set" /></b-table-column>
         <b-table-column field="rise" label="Rise" v-slot="props"><UtcTime :value="props.row.rise" /></b-table-column>
         <b-table-column field="mc" label="MC" v-slot="props"><UtcTime :value="props.row.mc" /></b-table-column>

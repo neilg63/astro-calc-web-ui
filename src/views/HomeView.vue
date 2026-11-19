@@ -13,7 +13,6 @@ onMounted(() => run({}))
 
 <template>
   <section class="view-page view-home">
-    <h1 class="view-title title home-title">Home</h1>
     <p class="view-subtitle subtitle">A browser front end for every astro-calc-api endpoint.</p>
 
     <div class="home-tile-grid mt-4">
@@ -29,8 +28,8 @@ onMounted(() => run({}))
         <div class="home-info-box box">
           <p><strong>{{ (info as IndexInfo).name }}</strong> v{{ (info as IndexInfo).version }}</p>
           <p v-if="(info as IndexInfo).ephemeris_range">
-            Ephemeris coverage: <UtcTime :value="(info as IndexInfo).ephemeris_range!.from" /> —
-            <UtcTime :value="(info as IndexInfo).ephemeris_range!.to" />
+            Ephemeris coverage: <UtcTime :value="(info as IndexInfo).ephemeris_range!.from" mode="utc" /> —
+            <UtcTime :value="(info as IndexInfo).ephemeris_range!.to" mode="utc" />
           </p>
           <p>Station table: {{ (info as IndexInfo).station_table ? 'available' : 'not loaded' }}</p>
         </div>

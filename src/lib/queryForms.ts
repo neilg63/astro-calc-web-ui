@@ -1,5 +1,5 @@
-import { reactive } from 'vue'
-import type { AspectDef, MomentChoice } from '../stores/preferences'
+import { computed, reactive, type WritableComputedRef } from 'vue'
+import type { AspectDef, HistoricChoice, MomentChoice } from '../stores/preferences'
 import { usePreferencesStore } from '../stores/preferences'
 import { perspective, type PerspectiveKey } from './perspectives'
 
@@ -33,6 +33,62 @@ export function momentParams(form: MomentForm): Record<string, unknown> {
     default:
       return {}
   }
+}
+
+/** The zodiac of a form: an ayanamsha key (none for tropical) and whether longitudes are sidereal. */
+export interface AyanamshaChoice {
+  aya: string[]
+  sid: boolean
+}
+
+/**
+ * The ayanamsha choice shared by every page that has one. Like the date-time and the
+ * location, it lives in the preferences store, so it carries from page to page and is still
+ * there on the next visit.
+ */
+export function useAyanamshaChoice(): WritableComputedRef<AyanamshaChoice> {
+  const prefs = usePreferencesStore()
+  return computed({
+    get: () => ({ aya: prefs.ayanamshas, sid: prefs.sidereal }),
+    set: (choice) => {
+      prefs.ayanamshas = choice.aya
+      prefs.sidereal = choice.aya.length > 0 && choice.sid
+    },
+  })
+}
+
+/**
+ * The same shared choice as one key, '' for tropical, for pages whose longitudes are always
+ * sidereal once an ayanamsha is chosen. Leaving tropical turns the sidereal flag on, as the
+ * ayanamsha fields do; changing from one ayanamsha to another leaves it as it was.
+ */
+export function useAyanamshaKey(): WritableComputedRef<string> {
+  const prefs = usePreferencesStore()
+  return computed({
+    get: () => prefs.ayanamshas[0] ?? '',
+    set: (key) => {
+      if (!key) {
+        prefs.ayanamshas = []
+        prefs.sidereal = false
+      } else {
+        if (!prefs.ayanamshas.length) prefs.sidereal = true
+        prefs.ayanamshas = [key]
+      }
+    },
+  })
+}
+
+/** The historic moment and place of the transposed pages, kept in the preferences store. */
+export function useHistoricForm(): HistoricChoice {
+  return usePreferencesStore().historic
+}
+
+/** `h_dt` or `h_jd`, and `h_loc` when the historic place is wanted (the topocentric view). */
+export function historicParams(form: HistoricChoice, withPlace = true): Record<string, unknown> {
+  const isNumber = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v)
+  const moment = form.mode === 'jd' ? { h_jd: form.jd } : { h_dt: form.dt }
+  if (!withPlace || !isNumber(form.lat) || !isNumber(form.lng)) return moment
+  return { ...moment, h_loc: isNumber(form.alt) ? `${form.lat},${form.lng},${form.alt}` : `${form.lat},${form.lng}` }
 }
 
 /** A second moment, for range-based endpoints (`stations`, `moon-phases`). */

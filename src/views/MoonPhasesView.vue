@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import RunButton from '../components/RunButton.vue'
 import { reactive } from 'vue'
 import { useEndpoint } from '../api/useEndpoint'
 import { momentParams, rangeEndParams, useMomentForm, useRangeEndForm } from '../lib/queryForms'
@@ -14,7 +15,7 @@ import type { MoonPhaseEntry } from '../api/types'
 const moment = useMomentForm()
 const rangeEnd = useRangeEndForm()
 const prefs = usePreferencesStore()
-const opts = reactive({ num: 4, ps: 'geo' as 'geo' | 'topo' })
+const opts = reactive({ num: 4, ps: 'topo' as 'geo' | 'topo' })
 
 interface MoonPhasesResult {
   date: unknown
@@ -40,7 +41,6 @@ function submit() {
 
 <template>
   <section class="view-page view-moon-phases">
-  <h1 class="view-title title">Moon Phases</h1>
   <div class="view-form box horizontal-form">
     <MomentFields :form="moment" />
     <RangeEndFields :form="rangeEnd" />
@@ -50,13 +50,13 @@ function submit() {
       </b-field>
       <b-field label="Perspective" label-position="on-border">
         <b-select size="is-small" v-model="opts.ps">
-          <option value="geo">Geocentric</option>
           <option value="topo">Topocentric</option>
+          <option value="geo">Geocentric</option>
         </b-select>
       </b-field>
     </b-field>
     <LocationFields v-if="opts.ps === 'topo'" />
-    <b-button size="is-small" type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
+    <RunButton :loading="loading" @click="submit" />
   </div>
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">

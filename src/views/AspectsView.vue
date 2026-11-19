@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import BodyKey from '../components/BodyKey.vue'
+import RunButton from '../components/RunButton.vue'
 import { reactive } from 'vue'
 import { useEndpoint } from '../api/useEndpoint'
 import { CORE_BODY_KEYS } from '../stores/reference'
 import { aspectsParam, momentParams, useMomentForm } from '../lib/queryForms'
-import { PERSPECTIVES, perspectiveBodies, type PerspectiveKey } from '../lib/perspectives'
+import { PERSPECTIVES, observableBodies, type PerspectiveKey } from '../lib/perspectives'
 import PerspectiveSelect from '../components/PerspectiveSelect.vue'
 import MomentFields from '../components/MomentFields.vue'
 import LocationFields from '../components/LocationFields.vue'
@@ -34,7 +36,7 @@ const { data, error, loading, run, lastUrl } = useEndpoint<AspectsResult>('/aspe
 
 function submit() {
   run({
-    bodies: perspectiveBodies(bodies.keys, ps.value).keys,
+    bodies: observableBodies(bodies.keys, ps.value),
     ...momentParams(moment),
     ps: ps.value,
     loc: ps.value === 'topo' ? prefs.loc : undefined,
@@ -45,23 +47,22 @@ function submit() {
 
 <template>
   <section class="view-page view-aspects">
-  <h1 class="view-title title">Aspects</h1>
   <p class="view-subtitle subtitle">Every aspect between the selected bodies, by ecliptic longitude.</p>
 
   <div class="view-form box horizontal-form">
-    <BodySelect v-model="bodies.keys" />
+    <BodySelect v-model="bodies.keys" :perspective="ps.value" />
     <MomentFields :form="moment" />
-    <PerspectiveSelect v-model="ps.value" :allow="ASPECT_PERSPECTIVES" :bodies="bodies.keys" />
+    <PerspectiveSelect v-model="ps.value" :allow="ASPECT_PERSPECTIVES" />
     <LocationFields v-if="ps.value === 'topo'" />
     <AspectOrbsEditor v-model="aspects.defs" />
-    <b-button size="is-small" type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
+    <RunButton :loading="loading" @click="submit" />
   </div>
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">
     <template #default="{ data: res }">
-      <b-table :data="(res as AspectsResult).aspects" striped narrowed paginated per-page="25">
-        <b-table-column field="a" label="Body A" v-slot="props">{{ props.row.a }}</b-table-column>
-        <b-table-column field="b" label="Body B" v-slot="props">{{ props.row.b }}</b-table-column>
+      <b-table :data="(res as AspectsResult).aspects" striped narrowed paginated per-page="100">
+        <b-table-column field="a" label="Body A" v-slot="props"><BodyKey :value="props.row.a" /></b-table-column>
+        <b-table-column field="b" label="Body B" v-slot="props"><BodyKey :value="props.row.b" /></b-table-column>
         <b-table-column field="aspect" label="Aspect" v-slot="props">{{ round(props.row.aspect, 1) }}°</b-table-column>
         <b-table-column field="orb" label="Orb" v-slot="props">{{ round(props.row.orb, 2) }}</b-table-column>
         <b-table-column field="divergence" label="Divergence" v-slot="props">{{ round(props.row.divergence, 3) }}</b-table-column>

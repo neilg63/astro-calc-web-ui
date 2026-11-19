@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import { useAyanamshaKey } from '../lib/queryForms'
+import BodyKey from '../components/BodyKey.vue'
+import RunButton from '../components/RunButton.vue'
+import { ayanamshaLabel } from '../lib/zodiac'
+import { useReferenceStore } from '../stores/reference'
 import { computed, reactive, watch } from 'vue'
 import { useEndpoint } from '../api/useEndpoint'
 import { CORE_BODY_KEYS } from '../stores/reference'
@@ -36,13 +41,13 @@ const EXAMPLES: Record<BulkKind, string> = {
 
 const prefs = usePreferencesStore()
 const moment = useMomentForm()
+const aya = useAyanamshaKey()
 const form = reactive({
   kind: 'charts' as BulkKind,
   body: EXAMPLES.charts,
   bodies: [...CORE_BODY_KEYS],
   bodies2: [] as string[],
-  ps: 'geo' as 'geo' | 'topo',
-  aya: '',
+  ps: 'topo' as 'geo' | 'topo',
   tags: '',
   prog: '',
 })
@@ -73,6 +78,7 @@ interface BulkResult {
   errors: BulkError[]
 }
 
+const reference = useReferenceStore()
 const { data, error, loading, run, lastUrl } = useEndpoint<BulkResult>(PATHS.charts)
 
 const chartRows = computed(() =>
@@ -105,8 +111,8 @@ function submit() {
     {
       bodies: form.bodies,
       ps: form.ps,
-      aya: form.aya,
-      sid: form.aya ? 1 : undefined,
+      aya: aya.value,
+      sid: aya.value ? 1 : undefined,
       ...(isAspects.value
         ? {
             bodies2: form.bodies2,
@@ -125,7 +131,6 @@ function submit() {
 
 <template>
   <section class="view-page view-bulk">
-    <h1 class="view-title title">Bulk</h1>
     <p class="view-subtitle subtitle">Charts and aspect searches over many records (POST). Record dates are UTC.</p>
 
     <div class="view-form box horizontal-form">
@@ -141,11 +146,11 @@ function submit() {
       <BodySelect v-if="isAspects" v-model="form.bodies2" label="Bodies (chart B, empty = same)" />
       <b-field label="Perspective" label-position="on-border">
         <b-select size="is-small" v-model="form.ps">
-          <option value="geo">Geocentric</option>
           <option value="topo">Topocentric</option>
+          <option value="geo">Geocentric</option>
         </b-select>
       </b-field>
-      <AyanamshaSelect v-model="form.aya" />
+      <AyanamshaSelect v-model="aya" />
       <b-field v-if="form.kind !== 'pairs'" label="Tag filter (key:value,…)" label-position="on-border">
         <b-input size="is-small" v-model="form.tags" placeholder="sex:f" />
       </b-field>
@@ -164,7 +169,7 @@ function submit() {
       <b-field class="bulk-records" label="Records (JSON)">
         <b-input size="is-small" type="textarea" rows="7" v-model="form.body" spellcheck="false" />
       </b-field>
-      <b-button size="is-small" type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
+      <RunButton :loading="loading" @click="submit" />
     </div>
 
     <b-notification v-if="parseError.message" type="is-danger" :closable="false">{{ parseError.message }}</b-notification>
@@ -172,7 +177,7 @@ function submit() {
     <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">
       <template #default="{ data: res }">
         <p class="result-summary">
-          POST · {{ (res as BulkResult).ps }} · {{ (res as BulkResult).sidereal ? `sidereal (${(res as BulkResult).sidereal})` : 'tropical' }} ·
+          POST · {{ (res as BulkResult).ps }} · {{ (res as BulkResult).sidereal ? `sidereal (${ayanamshaLabel(reference.ayanamshaName((res as BulkResult).sidereal!))})` : 'tropical' }} ·
           {{ (res as BulkResult).count }} {{ (res as BulkResult).charts ? 'charts' : 'matches' }}
           <template v-if="(res as BulkResult).progressed">
             · progressed to <UtcTime :value="(res as BulkResult).progressed!.date" /> (A {{ (res as BulkResult).progressed!.a }}, B
@@ -180,10 +185,10 @@ function submit() {
           </template>
         </p>
 
-        <b-table v-if="(res as BulkResult).charts" :data="chartRows" striped narrowed paginated per-page="25" pagination-size="is-small">
+        <b-table v-if="(res as BulkResult).charts" :data="chartRows" striped narrowed paginated per-page="100" pagination-size="is-small">
           <b-table-column field="ref" label="Record" v-slot="props">{{ props.row.ref }}</b-table-column>
-          <b-table-column field="when" label="Date (UTC)" v-slot="props"><UtcTime :value="props.row.when" /></b-table-column>
-          <b-table-column field="key" label="Body" v-slot="props">{{ props.row.key }}</b-table-column>
+          <b-table-column field="when" label="Date" v-slot="props"><UtcTime :value="props.row.when" /></b-table-column>
+          <b-table-column field="key" label="Body" v-slot="props"><BodyKey :value="props.row.key" /></b-table-column>
           <b-table-column field="lng" label="Longitude" v-slot="props"><DegreeValue :value="props.row.lng" /></b-table-column>
           <b-table-column field="lat" label="Latitude" numeric v-slot="props">{{ round(props.row.lat) }}</b-table-column>
           <b-table-column field="lng_speed" label="Lng speed" numeric v-slot="props">{{ round(props.row.lng_speed) }}</b-table-column>
@@ -191,12 +196,12 @@ function submit() {
           <b-table-column field="engine" label="Engine" v-slot="props">{{ props.row.engine }}</b-table-column>
         </b-table>
 
-        <b-table v-else :data="matchRows" striped narrowed paginated per-page="25" pagination-size="is-small">
+        <b-table v-else :data="matchRows" striped narrowed paginated per-page="100" pagination-size="is-small">
           <b-table-column field="ref_a" label="Record A" v-slot="props">{{ props.row.ref_a }}</b-table-column>
-          <b-table-column field="a" label="Body A" v-slot="props">{{ props.row.a }}</b-table-column>
+          <b-table-column field="a" label="Body A" v-slot="props"><BodyKey :value="props.row.a" /></b-table-column>
           <b-table-column field="lng_a" label="Longitude A" v-slot="props"><DegreeValue :value="props.row.lng_a" /></b-table-column>
           <b-table-column field="ref_b" label="Record B" v-slot="props">{{ props.row.ref_b }}</b-table-column>
-          <b-table-column field="b" label="Body B" v-slot="props">{{ props.row.b }}</b-table-column>
+          <b-table-column field="b" label="Body B" v-slot="props"><BodyKey :value="props.row.b" /></b-table-column>
           <b-table-column field="lng_b" label="Longitude B" v-slot="props"><DegreeValue :value="props.row.lng_b" /></b-table-column>
           <b-table-column field="aspect" label="Aspect" numeric v-slot="props">{{ round(props.row.aspect, 1) }}°</b-table-column>
           <b-table-column field="orb" label="Orb" numeric v-slot="props">{{ round(props.row.orb, 2) }}</b-table-column>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import RunButton from '../components/RunButton.vue'
 import { computed } from 'vue'
 import { useEndpoint } from '../api/useEndpoint'
 import { momentParams, useMomentForm } from '../lib/queryForms'
@@ -66,13 +67,12 @@ function submit() {
 
 <template>
   <section class="view-page view-indian-day">
-  <h1 class="view-title title">Indian Day</h1>
   <p class="view-subtitle subtitle">The sunrise-to-sunrise day containing the date, with ghati/vighati time units.</p>
 
   <div class="view-form box horizontal-form">
     <MomentFields :form="moment" />
     <LocationFields />
-    <b-button size="is-small" type="is-primary" class="run-button" @click="submit" :loading="loading">Run</b-button>
+    <RunButton :loading="loading" @click="submit" />
   </div>
 
   <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">
