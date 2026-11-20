@@ -5,7 +5,7 @@ import { usePreferencesStore } from '../stores/preferences'
 import { useReferenceStore } from '../stores/reference'
 
 const prefs = usePreferencesStore()
-const { apiBase, cs, ps, defaultOrb } = storeToRefs(prefs)
+const { apiBase, cs, ps, defaultOrb, theme } = storeToRefs(prefs)
 
 const reference = useReferenceStore()
 const { loading: referenceLoading, error: referenceError } = storeToRefs(reference)
@@ -46,6 +46,15 @@ function resetPreferences() {
         </div>
         <div class="column is-half">
           <PerspectiveSelect v-model="ps" horizontal />
+        </div>
+        <div class="column is-half">
+          <b-field horizontal label="Colour scheme">
+            <b-select v-model="theme" size="is-small" expanded>
+              <option value="system">Follow the system</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </b-select>
+          </b-field>
         </div>
       </div>
 

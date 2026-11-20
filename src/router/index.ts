@@ -9,7 +9,7 @@ const routes = [
   { path: '/extended-position', redirect: '/extended-positions' },
   { path: '/extended-positions', name: 'extended-positions', component: () => import('../views/ExtendedPositionsView.vue'), meta: { label: 'Extended Positions' } },
   { path: '/longitude-progress', name: 'longitude-progress', component: () => import('../views/LongitudeProgressView.vue'), meta: { label: 'Longitude Progress' } },
-  { path: '/progress', name: 'progress', component: () => import('../views/ProgressView.vue'), meta: { label: 'Progress' } },
+  { path: '/progress', name: 'progress', component: () => import('../views/ProgressView.vue'), meta: { label: 'Graha Progress' } },
   { path: '/ascendant', name: 'ascendant', component: () => import('../views/AscendantView.vue'), meta: { label: 'Ascendant' } },
   { path: '/ascendant-progress', name: 'ascendant-progress', component: () => import('../views/AscendantProgressView.vue'), meta: { label: 'Ascendant Progress' } },
   // The Angles page showed the same points as Ascendant.

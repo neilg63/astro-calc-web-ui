@@ -4,10 +4,124 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AstroCalc Demo</title>
+
+    <!--
+      Search and sharing tags. %SITE_URL% is the public address of the deployed site:
+      https://astrodemo.multifaceted.info unless VITE_SITE_URL names another at build time
+      (see vite.config.ts and .env.example). With an empty VITE_SITE_URL the image paths are
+      root-relative and the tags marked data-absolute are left out.
+    -->
+    <title>AstroCalc Demo – planetary positions, houses, rise and set times</title>
+    <meta
+      name="description"
+      content="A free browser front end for the AstroCalc API: planetary positions, house cusps, ayanamshas, rise and set times, stations, moon phases and aspects."
+    />
+    <meta
+      name="keywords"
+      content="astronomical calculator, ephemeris, planetary positions, ecliptic longitude, house systems, ascendant, ayanamsha, sidereal zodiac, rise and set times, retrograde stations, moon phases, aspects, Indian day, ghati, Julian Day, astrology API"
+    />
+    <meta name="author" content="Neil Gardner" />
+    <meta name="application-name" content="AstroCalc Demo" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#2e333d" />
+    <link rel="canonical" href="%SITE_URL%/" data-absolute />
+
+    <!-- Open Graph: the card shown when a link is shared. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AstroCalc Demo" />
+    <meta property="og:locale" content="en_GB" />
+    <meta property="og:title" content="AstroCalc Demo – planetary positions, houses, rise and set times" />
+    <meta
+      property="og:description"
+      content="Planetary longitudes, house cusps, ayanamshas, rise and set times, retrograde stations, moon phases and aspects for any date and place, straight from the AstroCalc API."
+    />
+    <meta property="og:url" content="%SITE_URL%/" data-absolute />
+    <meta property="og:image" content="%SITE_URL%/previews/preview-home-large.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1186" />
+    <meta property="og:image:height" content="681" />
+    <meta property="og:image:alt" content="The AstroCalc Demo home page: a grid of 21 tools, from Longitudes and Houses to Moon Phases and Stars." />
+
+    <!-- Twitter / X card. -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="AstroCalc Demo – planetary positions, houses, rise and set times" />
+    <meta
+      name="twitter:description"
+      content="Planetary longitudes, house cusps, ayanamshas, rise and set times, retrograde stations, moon phases and aspects for any date and place."
+    />
+    <meta name="twitter:image" content="%SITE_URL%/previews/preview-home-large.png" />
+    <meta name="twitter:image:alt" content="The AstroCalc Demo home page: a grid of 21 tools, from Longitudes and Houses to Moon Phases and Stars." />
+
+    <!-- Structured data for search engines. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "AstroCalc Demo",
+        "description": "A browser front end for the AstroCalc API: planetary positions, house cusps, ayanamshas, rise and set times, retrograde stations, moon phases and aspects for any date and place.",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires JavaScript",
+        "isAccessibleForFree": true,
+        "image": "%SITE_URL%/previews/preview-home-large.png",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "GBP" }
+      }
+    </script>
+
+    <!-- The stored or system colour scheme, set before anything is drawn (see src/lib/theme.ts). -->
+    <script>
+      ;(function () {
+        var theme = 'system'
+        try {
+          theme = JSON.parse(localStorage.getItem('astro-calc-web-ui.preferences.v1') || '{}').theme || 'system'
+        } catch (e) {}
+        if (theme !== 'light' && theme !== 'dark') {
+          theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        }
+        document.documentElement.dataset.theme = theme
+      })()
+    </script>
+    <style>
+      /* The page as it stands until the app has loaded, and for readers without JavaScript. */
+      .preload-page {
+        max-width: 46rem;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+        font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        line-height: 1.5;
+      }
+      .preload-page h1 {
+        margin: 0 0 0.5rem;
+        font-size: 1.5rem;
+      }
+      .preload-page ul {
+        padding-left: 1.25rem;
+      }
+    </style>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <!-- Replaced by the app when it mounts; read by search engines and shown while it loads. -->
+      <main class="preload-page">
+        <h1>AstroCalc Demo</h1>
+        <p>
+          A browser front end for every endpoint of the AstroCalc API: astronomical and astrological calculations for any date and place,
+          shown as tables with the raw JSON alongside.
+        </p>
+        <ul>
+          <li><a href="/longitudes">Longitudes</a> and <a href="/positions">positions</a> of the Sun, Moon, planets and nodes, tropical or sidereal</li>
+          <li><a href="/houses">House cusps</a> in fourteen systems, plus the 36 Gauquelin sectors</li>
+          <li>The <a href="/ascendant">ascendant</a> and other chart angles</li>
+          <li><a href="/ayanamsha">Ayanamshas</a>: the offsets of the sidereal zodiacs</li>
+          <li><a href="/rise-set">Rise, set and transit times</a>, for one day or day by day</li>
+          <li><a href="/stations">Retrograde stations</a> and <a href="/progress">planetary movements over time</a></li>
+          <li><a href="/moon-phases">Moon phases</a>, <a href="/pheno">phenomena</a> and <a href="/aspects">aspects between bodies</a></li>
+          <li>The <a href="/indian-day">Indian day</a> from sunrise to sunrise, in ghatis and vighatis</li>
+          <li><a href="/stars">Named fixed stars</a> and transposed positions of historic points</li>
+        </ul>
+        <noscript><p>This application needs JavaScript to run the calculations and show their results.</p></noscript>
+      </main>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

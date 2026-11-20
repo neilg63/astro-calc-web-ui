@@ -13,7 +13,9 @@
  * Class name map, by area:
  *   App shell      .app-navbar, .app-navbar-brand, .app-navbar-burger,
  *                   .app-navbar-title, .app-navbar-page-title (the page's h1, after a divider), .app-nav-menu, .app-nav-menu-item,
- *                   .app-nav-backdrop, .app-main
+ *                   .app-nav-backdrop, .app-main (the page area; its side padding widens above 1280px),
+ *                   .app-theme-switch (the light/dark switcher at the right of the bar),
+ *                   .app-theme-switch-button (its round button: .is-dark shows a sun, .is-light a moon)
  *   Every view      .view-page, .view-<route> (e.g. .view-positions),
  *                   .view-title, .view-subtitle, .view-form, .run-button
  *   Home            .home-tile-grid, .home-tile, .home-tile-icon,
@@ -37,6 +39,11 @@
  *                   .station-event (an event on Stations: .is-peak, .is-retro-start, .is-retro-peak,
  *                   .is-retro-end; the start and end of a retrograde are italic and teal),
  *                   tr.is-nearest (the Stations row nearest the moment, in bold);
+ *                   tr.phase-1 to tr.phase-4 (Moon Phases rows: new moon, first quarter, full moon, last quarter;
+ *                   new moon in the accent colour, full moon in bold),
+ *                   tr.is-latest (the Moon Phases row for the latest phase, already past, in italics);
+ *                   .moon-phase (a phase label on Moon Phases: .is-1 new to .is-4 last quarter),
+ *                   .moon-phase-icon (its symbol, in a fixed-width slot so the names line up);
  *                   Stations rows also carry the event type (tr.is-retro-start …), italic at a retrograde's start and end
  *   Form components .moment-fields, .moment-mode (the Now / Date-time / Julian Day selector), .location-fields, .location-latitude, .location-longitude (6em boxes),
  *                   .location-altitude, .view-fields,
@@ -63,7 +70,13 @@
  *                   for the other two formats.
  */
 
-:root {
+/*
+ * Colours. The root element carries `data-theme` (light or dark: see lib/theme.ts), which
+ * Bulma and Buefy follow too. The dark set is the base; the light set replaces it in light
+ * mode, except inside the top bar and its menu, which stay dark in both.
+ */
+:root,
+:root[data-theme='light'] .app-navbar {
   --acw-accent: #3dd6b4;
   --acw-bg: #121212;
   --acw-surface: #1a1a1a;
@@ -76,6 +89,33 @@
   --acw-button: #c8ccd0;
   --acw-button-hover: #e3e6e8;
   --acw-button-text: #16181a;
+  /* Menu links. */
+  --acw-menu-text: #ddd;
+  --acw-menu-text-hover: #fff;
+}
+
+:root[data-theme='light'] {
+  /* A deeper teal: the bright one is too faint as text on white. */
+  --acw-accent: #0b8570;
+  --acw-bg: #fff;
+  --acw-surface: #f4f6f7;
+  --acw-surface-hover: #e8ecee;
+  --acw-border: #d5dadd;
+  --acw-text-muted: #5c6670;
+  --acw-accent-2: var(--acw-accent);
+  /* Action buttons: dark grey with light content. */
+  --acw-button: #2f3438;
+  --acw-button-hover: #454b50;
+  --acw-button-text: #fff;
+}
+
+/* Native controls (date pickers, scrollbars) follow the scheme. */
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
 }
 
 /* ---- App shell ---- */
@@ -105,6 +145,11 @@
 
 #app .app-main {
   margin-top: var(--acw-navbar-height);
+  /*
+   * Side padding: 1rem up to a 1280px window, then 30% of every pixel beyond that on each
+   * side, so the content keeps growing (by 40%) while the margins open up around it.
+   */
+  padding-inline: max(1rem, calc(1rem + (100vw - 1280px) * 0.3));
 }
 
 /* The page title follows the app name in the bar, after a vertical divider. */
@@ -141,9 +186,13 @@
   left: 0;
   z-index: 30;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  /* One column on a phone, up to four on a laptop (see the breakpoints below). */
+  grid-template-columns: minmax(max-content, 1fr);
   gap: 0.25rem;
-  width: min(32rem, 100vw);
+  /* Most of the window's width, and never narrower than its labels need to stay on one line. */
+  width: 78vw;
+  min-width: max-content;
+  max-width: 100vw;
   /* Never taller than the window below the bar: the menu scrolls inside itself. */
   max-height: calc(100vh - var(--acw-navbar-height) - 1rem);
   overflow-y: auto;
@@ -159,13 +208,78 @@
   gap: 0.5rem;
   padding: 0.5rem 0.6rem;
   border-radius: 4px;
-  color: #ddd;
+  color: var(--acw-menu-text);
   font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+/*
+ * Each step is the narrowest window that holds that many columns of one-line labels (four
+ * need about 765px, three 580px, two 400px). Below about 980px the menu is wider than 78%.
+ */
+@media (min-width: 432px) {
+  .app-nav-menu {
+    grid-template-columns: repeat(2, minmax(max-content, 1fr));
+  }
+}
+
+@media (min-width: 608px) {
+  .app-nav-menu {
+    grid-template-columns: repeat(3, minmax(max-content, 1fr));
+  }
+}
+
+@media (min-width: 800px) {
+  .app-nav-menu {
+    grid-template-columns: repeat(4, minmax(max-content, 1fr));
+  }
 }
 
 .app-nav-menu-item:hover {
   background: var(--acw-surface-hover);
-  color: #fff;
+  color: var(--acw-menu-text-hover);
+}
+
+/* Flush right in the bar at every width, whatever else the bar holds. */
+#app .app-theme-switch {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  transform: translateY(-50%);
+}
+
+.app-theme-switch-button {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+/* Dark mode: a yellow sun on a dark disc. */
+.app-theme-switch-button.is-dark {
+  background: #1f1f1f;
+  color: #ffd21f;
+}
+
+.app-theme-switch-button.is-dark:hover {
+  background: #2e2e2e;
+}
+
+/* Light mode: a navy moon on a pale disc. */
+.app-theme-switch-button.is-light {
+  background: #f1f1f4;
+  color: #0b0b6b;
+}
+
+.app-theme-switch-button.is-light:hover {
+  background: #fff;
 }
 
 .app-nav-backdrop {
@@ -330,6 +444,15 @@
   color: yellow;
 }
 
+/* Light mode: white and yellow would vanish on the pale tiles. */
+:root[data-theme='light'] #app .home-tile-grid > a {
+  color: #1f2428;
+}
+
+:root[data-theme='light'] #app .home-tile-grid > a:hover {
+  color: var(--acw-accent);
+}
+
 
 #app .home-title {
   font-size: 1em;
@@ -438,6 +561,25 @@
 }
 
 /* Stations: the event nearest the moment. */
+#app .moon-phase-icon {
+  display: inline-block;
+  width: 1.2em;
+  text-align: center;
+  font-style: normal;
+}
+
+#app .view-moon-phases tr.phase-1 td {
+  color: var(--acw-accent);
+}
+
+#app .view-moon-phases tr.phase-3 td {
+  font-weight: 700;
+}
+
+#app .view-moon-phases tr.is-latest td {
+  font-style: italic;
+}
+
 #app .view-stations tr.is-nearest td {
   font-weight: 700;
 }
@@ -607,6 +749,19 @@
 .utc-time {
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+}
+
+/*
+ * A date-time's tooltip is far wider than the date and dates sit in the first column, so
+ * centred it would run off the left of the window. It starts at the date's left edge instead.
+ */
+#app .utc-time.b-tooltip.is-top .tooltip-content {
+  left: 0;
+  transform: none;
+}
+
+#app .utc-time.b-tooltip.is-top .tooltip-content::before {
+  left: 1.5rem;
 }
 
 /*

@@ -81,6 +81,8 @@ export interface PreferencesState {
   historic: HistoricChoice
   cs: 'ecl' | 'equ' | 'hor'
   ps: PerspectiveKey
+  /** The colour scheme: the system's or browser's own, or one chosen with the switcher. */
+  theme: 'system' | 'light' | 'dark'
   /** Which set of defaults the stored preferences were made under: see `DEFAULTS_VERSION`. */
   defaultsVersion: number
   ayanamshas: string[]
@@ -109,6 +111,7 @@ function defaults(): PreferencesState {
     historic: { mode: 'dt', dt: '2000-01-01T12:00:00', jd: 2451545.0, lat: 51.5074, lng: -0.1278, alt: 100, place: null, tzOffset: null, tzManual: false },
     cs: 'ecl',
     ps: 'topo',
+    theme: 'system',
     defaultsVersion: DEFAULTS_VERSION,
     ayanamshas: [],
     sidereal: false,
