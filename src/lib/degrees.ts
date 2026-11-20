@@ -78,6 +78,14 @@ export function formatLongitudeTooltip(value: number, ayanamsha: string | null =
   return `${signPosition(value).signName}: ${formatFullDms(value)} | ${formatDecimalDegrees(value, decimals)} ${ayanamsha || 'tropical'}`
 }
 
+/**
+ * The hover text of a longitude that is itself shown as full-circle DMS: its position by
+ * sign, decimal degrees and the zodiac, e.g. `9 ♑ 51' 23" | 279.8564° tropical`.
+ */
+export function formatSignTooltip(value: number, ayanamsha: string | null = null, decimals = 4): string {
+  return `${formatSignDms(value)} | ${formatDecimalDegrees(value, decimals)} ${ayanamsha || 'tropical'}`
+}
+
 export function formatFullDms(value: number): string {
   const d = fullDms(value)
   return `${d.deg}° ${d.min}' ${d.sec}"`

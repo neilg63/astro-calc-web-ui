@@ -26,6 +26,9 @@
  *                   .time-basis (UTC / local / Julian Day selector above results that show times),
  *                   .time-basis-note (says which, with the local offset; .is-local when local),
  *                   .jd-table (tables of date-times), .rise-sets-tabs,
+ *                   .houses-table (the cusps table on Houses: a row per system, a column per cusp,
+ *                   cells at the points list's size; .is-wide with the 36 Gauquelin sectors, which scroll
+ *                   sideways; -system is the short label, -fallback marks a system shown as another, -note says which),
  *                   .points-table, .points-columns (current and historic points side by side),
  *                   .points-list (chart points as a horizontal definition list above a positions table;
  *                   -title, -items, -item, with .is-sidasc on the sidereal ascendant),
@@ -44,7 +47,8 @@
  *                   .listing-fields, .listing-mode, .listing-before (the range of the Stations listing;
  *                   .is-manual when the days before were typed by hand),
  *                   .body-select, .historic-fields, .ayanamsha-fields, .house-system-select,
- *                   .tag-picker (the tag input inside .body-select),
+ *                   .tag-picker (the tag input inside .body-select and .house-system-select),
+ *                   .tag-picker-tag (a tag drawn with a tooltip, where labels are short forms),
  *                   .ayanamsha-fields-row,
  *                   .ayanamsha-fields-sidereal, .ayanamsha-select, .bulk-records,
  *                   .range-end-fields, .aspect-orbs-editor, .aspect-orbs-row,
@@ -372,14 +376,16 @@
 }
 
 
-/* Bodies take the last row, filling it up to the Run button at the bottom right. */
-#app .horizontal-form:has(> .body-select)::before {
+/* Bodies, or house systems, take the last row, filling it up to the Run button at the bottom right. */
+#app .horizontal-form:has(> .body-select)::before,
+#app .horizontal-form:has(> .house-system-select)::before {
   content: '';
   flex-basis: 100%;
   order: 1;
 }
 
-#app .horizontal-form > .body-select {
+#app .horizontal-form > .body-select,
+#app .horizontal-form > .house-system-select {
   order: 2;
   flex: 1 1 18rem;
 }
@@ -687,6 +693,38 @@
 
 #app .points-list-item.is-sidasc dd {
   font-weight: 600;
+}
+
+/* Houses: a row per system, a cusp per column, the cells at the size of the points list's values. */
+#app .houses-table th,
+#app .houses-table td {
+  font-size: 0.85em;
+  white-space: nowrap;
+  padding-left: 0.35em;
+  padding-right: 0.35em;
+}
+
+/*
+ * Cusp columns alternate between the normal text colour and the teal accent, to keep the eye
+ * in a column across a wide table. The first column, the system's label, is the first child;
+ * cusp 1 is the second.
+ */
+#app .houses-table th:nth-child(even),
+#app .houses-table td:nth-child(even) {
+  color: var(--acw-accent);
+}
+
+#app .houses-table-system {
+  font-style: italic;
+}
+
+/* With the 36 Gauquelin sectors the table scrolls sideways under its first column. */
+#app .houses-table.is-wide .table-wrapper {
+  overflow-x: auto;
+}
+
+#app .houses-table-fallback {
+  color: var(--acw-accent);
 }
 
 #app .points-columns {

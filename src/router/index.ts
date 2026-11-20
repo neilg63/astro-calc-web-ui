@@ -12,7 +12,8 @@ const routes = [
   { path: '/progress', name: 'progress', component: () => import('../views/ProgressView.vue'), meta: { label: 'Progress' } },
   { path: '/ascendant', name: 'ascendant', component: () => import('../views/AscendantView.vue'), meta: { label: 'Ascendant' } },
   { path: '/ascendant-progress', name: 'ascendant-progress', component: () => import('../views/AscendantProgressView.vue'), meta: { label: 'Ascendant Progress' } },
-  { path: '/angles', name: 'angles', component: () => import('../views/AnglesView.vue'), meta: { label: 'Angles' } },
+  // The Angles page showed the same points as Ascendant.
+  { path: '/angles', redirect: '/ascendant' },
   { path: '/houses', name: 'houses', component: () => import('../views/HousesView.vue'), meta: { label: 'Houses' } },
   { path: '/ayanamsha', name: 'ayanamsha', component: () => import('../views/AyanamshaView.vue'), meta: { label: 'Ayanamsha' } },
   { path: '/rise-set', name: 'rise-set', component: () => import('../views/RiseSetView.vue'), meta: { label: 'Rise / Set' } },

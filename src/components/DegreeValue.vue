@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, inject } from 'vue'
-import { formatDecimalDegrees, formatFullDms, formatLongitudeTooltip, formatSignDms } from '../lib/degrees'
+import { formatDecimalDegrees, formatFullDms, formatLongitudeTooltip, formatSignDms, formatSignTooltip } from '../lib/degrees'
 import { APPLIED_AYANAMSHA } from '../lib/zodiac'
 
 export type DegreeDisplayMode = 'sign' | 'dms' | 'decimal'
@@ -18,8 +18,16 @@ const props = withDefaults(
      * follows the response of the result panel the value sits in.
      */
     ayanamsha?: string | null
+    /**
+     * What the tooltip adds. `full` (the default) names the sign and gives full DMS and decimal
+     * degrees. `sign` is the variant for a value shown as full DMS: degrees within the sign
+     * with its symbol, and decimal degrees.
+     */
+    tooltip?: 'full' | 'sign'
+    /** Text put before the tooltip, e.g. a cusp's place in its set: `1/12`. */
+    prefix?: string
   }>(),
-  { mode: 'sign', decimals: 4, ayanamsha: undefined },
+  { mode: 'sign', decimals: 4, ayanamsha: undefined, tooltip: 'full' },
 )
 
 const formats = computed(() => ({
@@ -30,9 +38,11 @@ const formats = computed(() => ({
 
 const mainText = computed(() => formats.value[props.mode])
 const panelAyanamsha = inject(APPLIED_AYANAMSHA, null)
-const tooltipText = computed(() =>
-  formatLongitudeTooltip(props.value, props.ayanamsha !== undefined ? props.ayanamsha : (panelAyanamsha?.value ?? null), props.decimals),
-)
+const tooltipText = computed(() => {
+  const zodiac = props.ayanamsha !== undefined ? props.ayanamsha : (panelAyanamsha?.value ?? null)
+  const text = (props.tooltip === 'sign' ? formatSignTooltip : formatLongitudeTooltip)(props.value, zodiac, props.decimals)
+  return props.prefix ? `${props.prefix} · ${text}` : text
+})
 </script>
 
 <template>

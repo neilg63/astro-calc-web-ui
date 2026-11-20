@@ -4,6 +4,8 @@ import { computed, ref } from 'vue'
 export interface TagOption {
   key: string
   label: string
+  /** The full name, when `label` is a short form: shown in the suggestions and as the tag's tooltip. */
+  title?: string
 }
 
 /** A tag input with autocomplete over a fixed list of options; the model is the selected keys. */
@@ -17,12 +19,19 @@ const typed = ref('')
 const suggestions = computed(() => {
   const text = typed.value.trim().toLowerCase()
   return props.options.filter(
-    (o) => !props.modelValue.includes(o.key) && (text === '' || o.label.toLowerCase().includes(text) || o.key.toLowerCase().startsWith(text)),
+    (o) => !props.modelValue.includes(o.key) && (text === '' || o.label.toLowerCase().includes(text) || (o.title ?? '').toLowerCase().includes(text) || o.key.toLowerCase().startsWith(text)),
   )
 })
 
 function onTyping(value: string | number | undefined) {
   typed.value = String(value ?? '')
+}
+
+/** Tags are drawn here, with tooltips, only when the options have full names to show. */
+const titled = computed(() => props.options.some((o) => o.title))
+
+function remove(key: string) {
+  emit('update:modelValue', props.modelValue.filter((k) => k !== key))
 }
 
 function update(next: TagOption[]) {
@@ -46,7 +55,12 @@ function update(next: TagOption[]) {
     :aria-close-label="`Remove this ${itemName ?? 'item'}`"
     @typing="onTyping"
   >
-    <template #default="{ option: o }">{{ o.label }} ({{ o.key }})</template>
+    <template v-if="titled" #selected>
+      <b-tooltip v-for="tag in tags" :key="tag.key" :label="`${tag.title ?? tag.label} (${tag.key})`" position="is-top" class="tag-picker-tag">
+        <b-tag size="is-small" closable :aria-close-label="`Remove this ${itemName ?? 'item'}`" @close="remove(tag.key)">{{ tag.label }}</b-tag>
+      </b-tooltip>
+    </template>
+    <template #default="{ option: o }">{{ o.title ?? o.label }} ({{ o.key }})</template>
     <template #empty>No match</template>
   </b-taginput>
 </template>
