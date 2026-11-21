@@ -114,6 +114,31 @@ export interface MoonPhaseEntry extends Moment {
   phase: string
 }
 
+/** A tithi of `/tithis`: 1 to 30 from the new moon. */
+export interface TithiInfo {
+  num: number
+  paksha: 'Shukla' | 'Krishna'
+  /** The day within the paksha, 1 to 15. */
+  day: number
+  name: string
+  /** The phase it begins at: `New` for the 1st, `Full` for the 16th. */
+  phase: string | null
+}
+
+/** A karana of `/tithis`: 1 to 60 from the new moon, half a tithi. */
+export interface KaranaInfo {
+  num: number
+  name: string
+  tithi: number
+  half: 1 | 2
+  /** The phase it begins at, if any of the four. */
+  phase: string | null
+}
+
+/** A tithi or a karana with the moment it begins. */
+export type TithiEntry = Moment & TithiInfo
+export type KaranaEntry = Moment & KaranaInfo
+
 export interface PhenoEntry {
   key: string
   phase_angle: number
