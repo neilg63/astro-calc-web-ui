@@ -23,6 +23,8 @@ const routes = [
   { path: '/stations', name: 'stations', component: () => import('../views/StationsView.vue'), meta: { label: 'Stations' } },
   { path: '/moon-phases', name: 'moon-phases', component: () => import('../views/MoonPhasesView.vue'), meta: { label: 'Moon Phases' } },
   { path: '/tithis', name: 'tithis', component: () => import('../views/TithisView.vue'), meta: { label: 'Tithis' } },
+  { path: '/nakshatra', redirect: '/nakshatras' },
+  { path: '/nakshatras', name: 'nakshatras', component: () => import('../views/NakshatrasView.vue'), meta: { label: 'Nakshatras' } },
   { path: '/indian-day', name: 'indian-day', component: () => import('../views/IndianDayView.vue'), meta: { label: 'Indian Day' } },
   { path: '/pheno', name: 'pheno', component: () => import('../views/PhenoView.vue'), meta: { label: 'Phenomena' } },
   { path: '/aspects', name: 'aspects', component: () => import('../views/AspectsView.vue'), meta: { label: 'Aspects' } },

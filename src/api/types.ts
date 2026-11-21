@@ -139,6 +139,22 @@ export interface KaranaInfo {
 export type TithiEntry = Moment & TithiInfo
 export type KaranaEntry = Moment & KaranaInfo
 
+/** A body of `/nakshatra`: where its sidereal longitude falls among the 27 nakshatras. */
+export interface NakshatraEntry {
+  key: string
+  /** Sidereal longitude. */
+  lng: number
+  /** 1 (Ashwini) to 27 (Revati). */
+  num: number
+  name: string
+  pada: number
+  /** The ruling body's key, in Vimshottari order. */
+  lord: string
+  /** Degrees into the nakshatra, and the same as a part of the whole. */
+  degrees: number
+  fraction: number
+}
+
 export interface PhenoEntry {
   key: string
   phase_angle: number
