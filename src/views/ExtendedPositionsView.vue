@@ -23,7 +23,24 @@ const prefs = usePreferencesStore()
 const moment = useMomentForm()
 const view = useViewForm()
 const aya = useAyanamshaKey(() => view.ps)
-const form = reactive({ bodies: [...CORE_BODY_KEYS], speeds: false })
+const form = reactive({ bodies: [...CORE_BODY_KEYS], speeds: false, paired: false })
+
+/** The fields of a body without its key. */
+type ViewBlock = Omit<ExtendedBodyPosition, 'key'>
+
+/** A body of a `ps=both` response: the same fields from the centre of the Earth and from the place. */
+interface PairedBody {
+  key: string
+  geoc: ViewBlock
+  topo: ViewBlock
+}
+
+/** A table row: a body, or one of its two views in a paired result. */
+interface Row extends ExtendedBodyPosition {
+  view?: 'geoc' | 'topo'
+}
+
+const VIEW_LABELS = { geoc: 'Geocentric', topo: 'Topocentric' }
 
 interface ExtendedResult {
   date: unknown
@@ -32,7 +49,8 @@ interface ExtendedResult {
   ps: string
   sidereal: boolean
   ayanamshas: AyanamshaValue[]
-  bodies: ExtendedBodyPosition[]
+  /** With `ps=both` each body holds a geocentric and a topocentric block. */
+  bodies: (ExtendedBodyPosition | PairedBody)[]
   /** The chart points of the moment and place: from a place on the Earth's surface only. */
   points?: Angles
 }
@@ -42,7 +60,23 @@ const onEarth = computed(() => perspective(view.ps).earth)
 
 const { data, error, loading, run, lastUrl } = useEndpoint<ExtendedResult>('/extended-positions')
 
-const rows = computed<ExtendedBodyPosition[]>(() => data.value?.bodies ?? [])
+/** Geocentric and topocentric values can be paired: the two perspectives that differ by parallax. */
+const canPair = computed(() => view.ps === 'topo' || view.ps === 'geo')
+const paired = computed(() => form.paired && canPair.value)
+
+/** Whether the result on screen is a paired one. */
+const isPaired = computed(() => data.value?.ps === 'both')
+
+/** One row per body, or two in a paired result: geocentric first, topocentric under it. */
+const rows = computed<Row[]>(() =>
+  (data.value?.bodies ?? []).flatMap((body): Row[] =>
+    'geoc' in body ? [{ key: body.key, view: 'geoc', ...body.geoc }, { key: body.key, view: 'topo', ...body.topo }] : [body],
+  ),
+)
+
+function rowClass(row: Row): string {
+  return row.view ? `is-${row.view}` : ''
+}
 
 /** Whether the result has azimuth and altitude: not so from a centre away from the Earth. */
 const hasHorizon = computed(() => rows.value.some((row) => row.azi !== null && row.azi !== undefined))
@@ -50,9 +84,10 @@ const hasHorizon = computed(() => rows.value.some((row) => row.azi !== null && r
 
 function submit() {
   run({
-    bodies: positionBodies(form.bodies, view.ps),
+    // A paired request is resolved as topocentric, so the ascendant leads the list.
+    bodies: positionBodies(form.bodies, paired.value ? 'topo' : view.ps),
     ...momentParams(moment),
-    ps: view.ps,
+    ps: paired.value ? 'both' : view.ps,
     loc: onEarth.value ? prefs.loc : undefined,
     aya: aya.value,
     sid: aya.value ? 1 : undefined,
@@ -69,7 +104,8 @@ function submit() {
       <MomentFields :form="moment" />
       <ViewFields :form="view" hide-cs :location-required="onEarth" />
       <AyanamshaSelect v-if="ayanamshaApplies(view.ps)" v-model="aya" />
-      <b-field>
+      <b-field grouped group-multiline>
+        <b-checkbox v-if="canPair" class="paired-views-toggle" size="is-small" v-model="form.paired" title="Each body is given twice: from the centre of the Earth and from your place">Geocentric and topocentric together</b-checkbox>
         <b-checkbox size="is-small" v-model="form.speeds">Show speeds</b-checkbox>
       </b-field>
       <RunButton :loading="loading" @click="submit" />
@@ -78,7 +114,7 @@ function submit() {
     <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">
       <template #default="{ data: res }">
         <p class="result-summary">
-          {{ (res as ExtendedResult).ps }} ·
+          {{ isPaired ? 'geocentric and topocentric' : (res as ExtendedResult).ps }} ·
           <template v-if="(res as ExtendedResult).sidereal && (res as ExtendedResult).ayanamshas.length">
             sidereal longitude ({{ ayanamshaLabel((res as ExtendedResult).ayanamshas[0].name) }}, {{ round((res as ExtendedResult).ayanamshas[0].value, 4) }}°)
           </template>
@@ -86,8 +122,9 @@ function submit() {
           · angles in degrees, speeds in °/day, distance in AU
         </p>
         <PointsList v-if="(res as ExtendedResult).points" :points="(res as ExtendedResult).points!" :ayanamsha="(res as ExtendedResult).ayanamshas[0]" />
-        <b-table :data="rows" striped narrowed scrollable>
-          <b-table-column field="key" label="Body" v-slot="props"><BodyKey :value="props.row.key" /></b-table-column>
+        <b-table :class="{ 'paired-views-table': isPaired }" :data="rows" :striped="!isPaired" :row-class="rowClass" narrowed scrollable>
+          <b-table-column field="key" label="Body" v-slot="props"><BodyKey v-if="props.row.view !== 'topo'" :value="props.row.key" /></b-table-column>
+          <b-table-column field="view" label="Seen from" :visible="isPaired" v-slot="props"><span class="paired-view-label">{{ VIEW_LABELS[props.row.view as 'geoc' | 'topo'] }}</span></b-table-column>
           <b-table-column field="lng" label="Longitude" v-slot="props"><DegreeValue :value="props.row.lng" /></b-table-column>
           <b-table-column field="lat" label="Latitude" numeric v-slot="props">{{ round(props.row.lat) }}</b-table-column>
           <b-table-column field="ras" label="Right asc." numeric v-slot="props">{{ round(props.row.ras) }}</b-table-column>

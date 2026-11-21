@@ -44,6 +44,10 @@
  *                   tr.is-latest (the Moon Phases row for the latest phase, already past, in italics);
  *                   .moon-phase (a phase label on Moon Phases: .is-1 new to .is-4 last quarter),
  *                   .moon-phase-icon (its symbol, in a fixed-width slot so the names line up);
+ *                   .paired-views-table (Extended Positions with geocentric and topocentric values together:
+ *                   two rows per body, tr.is-geoc then tr.is-topo, the second muted and closing the pair with a border),
+ *                   .paired-view-label (the "Seen from" cell of such a row),
+ *                   .paired-views-toggle (the checkbox that asks for the pair);
  *                   Stations rows also carry the event type (tr.is-retro-start …), italic at a retrograde's start and end
  *   Form components .moment-fields, .moment-mode (the Now / Date-time / Julian Day selector), .location-fields, .location-latitude, .location-longitude (6em boxes),
  *                   .location-altitude, .view-fields,
@@ -915,4 +919,20 @@
 /* The two-letter abbreviation is smaller than the symbol and the text around it. */
 #app .body-key-abbr {
   font-size: 0.75em;
+}
+
+/* Extended Positions, geocentric and topocentric together: two rows per body. */
+#app .paired-views-table tr.is-geoc td {
+  border-bottom-width: 0;
+  padding-bottom: 0.1em;
+}
+
+#app .paired-views-table tr.is-topo td {
+  padding-top: 0.1em;
+  color: var(--acw-text-muted);
+}
+
+#app .paired-views-table .paired-view-label {
+  font-size: 0.85em;
+  white-space: nowrap;
 }
