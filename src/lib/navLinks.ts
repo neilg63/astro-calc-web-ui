@@ -11,6 +11,7 @@ export const ENDPOINT_LINKS: NavLink[] = [
   { to: '/positions', label: 'Positions', icon: 'map-marker-multiple', blurb: 'Several bodies at once' },
   { to: '/extended-positions', label: 'Extended Positions', icon: 'table-large', blurb: 'Ecliptic, equatorial, horizontal' },
   { to: '/progress', label: 'Graha Progress', icon: 'chart-timeline-variant', blurb: 'Planetary movements over time.' },
+  { to: '/solar-system', label: 'Solar System', icon: 'orbit', blurb: 'A year of orbits around the Sun' },
   { to: '/ascendant', label: 'Ascendant', icon: 'arrow-up-bold-circle-outline', blurb: 'The rising degree and other angles.' },
   { to: '/ascendant-progress', label: 'Ascendant Progress', icon: 'chart-bell-curve-cumulative', blurb: 'The rising degree over days' },
   { to: '/houses', label: 'Houses', icon: 'view-dashboard-outline', blurb: 'Cusps, any system' },

@@ -5,7 +5,7 @@ import { usePreferencesStore } from '../stores/preferences'
 import { useReferenceStore } from '../stores/reference'
 
 const prefs = usePreferencesStore()
-const { apiBase, cs, ps, defaultOrb, theme } = storeToRefs(prefs)
+const { apiBase, cs, ps, defaultOrb, theme, autoRecalc } = storeToRefs(prefs)
 
 const reference = useReferenceStore()
 const { loading: referenceLoading, error: referenceError } = storeToRefs(reference)
@@ -54,6 +54,11 @@ function resetPreferences() {
               <option value="light">Light</option>
               <option value="dark">Dark</option>
             </b-select>
+          </b-field>
+        </div>
+        <div class="column is-full">
+          <b-field class="auto-recalc-setting" horizontal label="Recalculate" message="Off: a changed form is flagged and waits for the Calculate button. On: results are fetched again about a second after the last change.">
+            <b-switch v-model="autoRecalc" size="is-small">Automatically, after the form changes</b-switch>
           </b-field>
         </div>
       </div>

@@ -17,10 +17,12 @@
  *                   .app-theme-switch (the light/dark switcher at the right of the bar),
  *                   .app-theme-switch-button (its round button: .is-dark shows a sun, .is-light a moon)
  *   Every view      .view-page, .view-<route> (e.g. .view-positions),
- *                   .view-title, .view-subtitle, .view-form, .run-button
+ *                   .view-title, .view-subtitle, .view-form, .run-button (the Calculate button;
+ *                   .is-stale once the form has changed since the results on show were fetched),
+ *                   .run-button-note (the line below it saying so)
  *   Home            .home-tile-grid, .home-tile, .home-tile-icon,
  *                   .home-tile-label, .home-tile-blurb, .home-info-box
- *   Settings        .settings-form, .settings-actions
+ *   Settings        .settings-form, .settings-actions, .auto-recalc-setting (the automatic recalculation switch)
  *   Results         .result-panel, .result-panel-error, .result-panel-loading,
  *                   .result-panel-url, .result-panel-body,
  *                   .result-panel-raw-toggle, .result-panel-raw,
@@ -53,6 +55,15 @@
  *                   accent colour and full moon in bold, tr.is-current in italics for the one in force),
  *                   .tithi-name, .tithi-paksha (cells of that table), .tithi-now (the line above it: the tithi in force),
  *                   .karanas-toggle (the checkbox that lists karanas instead);
+ *                   .span-years (the Solar System form's years slider),
+ *                   .orbit-chart (the Solar System diagram, an SVG; .shows-inner, .shows-core or .shows-all),
+ *                   .orbit-body and .orbit-body-<body key> (a planet's group, which sets its colour), .orbit-guide
+ *                   (its dashed mean-distance circle), .orbit-track (the span's travel), .orbit-dot, .orbit-label
+ *                   (.orbit-label-symbol, the large symbol, and .orbit-label-name),
+ *                   .orbit-moon, .orbit-sun, .orbit-axis, .orbit-direction (the 0°/90°/180°/270° labels),
+ *                   .orbit-controls (.orbit-range, the Inner / Core / All buttons, each an .orbit-range-option with a tooltip, .orbit-play, .orbit-day-slider, .orbit-day), .orbit-note,
+ *                   .solar-system-tabs (the Orbits tab, then one per body), .solar-system-table (a body's table;
+ *                   tr.is-current is the day on the diagram);
  *                   .nakshatras-table (the Nakshatras listing: each row is tr.nakshatra-1 to tr.nakshatra-27,
  *                   tr.pada-1 to tr.pada-4 and tr.lord-<body key>; tr.is-moon, the birth star's row, is bold),
  *                   .nakshatra-name, .nakshatra-degrees (cells of that table),
@@ -482,6 +493,39 @@
   color: var(--acw-accent-2);
 }
 
+/* The form has changed since the results were fetched: the button is ringed and pulses. */
+#app .run-button {
+  position: relative;
+}
+
+#app .run-button.is-stale .button {
+  box-shadow: 0 0 0 3px var(--acw-accent-2);
+  animation: run-button-stale 1.6s ease-in-out infinite;
+}
+
+@keyframes run-button-stale {
+  50% {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--acw-accent-2) 35%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #app .run-button.is-stale .button {
+    animation: none;
+  }
+}
+
+/* The note hangs below the button, right-aligned with it, without moving the form. */
+#app .run-button-note {
+  position: absolute;
+  top: calc(100% + 0.5em);
+  right: 0;
+  white-space: nowrap;
+  font-size: 0.7em;
+  line-height: 1.2;
+  color: var(--acw-accent-2);
+}
+
 #app .horizontal-form {
   display: flex;
   flex-flow: row wrap;
@@ -608,6 +652,137 @@
 
 #app .tithis-table tr.paksha-krishna .tithi-paksha {
   color: var(--acw-text-muted);
+}
+
+/* ---- Solar System: the planets around the Sun ---- */
+
+#app .orbit-controls {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  gap: 0.75em;
+  margin-bottom: 0.5em;
+}
+
+#app .orbit-day-slider {
+  flex: 1 1 12rem;
+  max-width: 28rem;
+  margin: 0;
+}
+
+#app .orbit-day {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.85em;
+}
+
+#app .orbit-range {
+  margin: 0 0.5em 0 0;
+}
+
+/* The years slider of the form: wide enough for ten ticks. */
+#app .horizontal-form > .span-years {
+  flex: 0 1 16rem;
+  margin-right: 1.5em;
+}
+
+#app .span-years .b-slider {
+  margin: 0.4em 0 0.9em;
+}
+
+#app .orbit-chart {
+  display: block;
+  width: 100%;
+  max-width: 40rem;
+  /* The whole diagram stays in view on a laptop screen. */
+  max-height: max(22rem, calc(100vh - 24rem));
+  margin: 0 auto;
+}
+
+/* Each planet's colour; the guide, track, dot and symbol all take it. */
+#app .orbit-body-me { --orbit-colour: #9aa0a6; }
+#app .orbit-body-ve { --orbit-colour: #d9a441; }
+#app .orbit-body-ea { --orbit-colour: #3b8de0; }
+#app .orbit-body-ma { --orbit-colour: #d9573b; }
+#app .orbit-body-ju { --orbit-colour: #c98a5a; }
+#app .orbit-body-sa { --orbit-colour: #b39b3f; }
+#app .orbit-body-ur { --orbit-colour: #2fa9b6; }
+#app .orbit-body-ne { --orbit-colour: #5a6fe0; }
+#app .orbit-body-pl { --orbit-colour: #a06bc4; }
+
+#app .orbit-guide {
+  fill: none;
+  stroke: var(--orbit-colour);
+  stroke-width: 0.75;
+  stroke-dasharray: 2 4;
+  opacity: 0.55;
+}
+
+#app .orbit-track {
+  fill: none;
+  stroke: var(--orbit-colour);
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+#app .orbit-dot {
+  fill: var(--orbit-colour);
+  stroke: var(--acw-bg);
+  stroke-width: 1.5;
+}
+
+#app .orbit-moon {
+  fill: var(--acw-text-muted);
+  stroke-width: 0.75;
+}
+
+/* A planet's label: a large symbol in the planet's colour, then its name. */
+#app .orbit-label {
+  fill: var(--orbit-colour);
+  paint-order: stroke;
+  stroke: var(--acw-bg);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
+#app .orbit-label-symbol {
+  font-size: 21px;
+}
+
+#app .orbit-label-name {
+  font-size: 12px;
+  fill: currentColor;
+}
+
+#app .orbit-sun {
+  fill: #f2b01e;
+}
+
+#app .orbit-axis {
+  stroke: var(--acw-border);
+  stroke-width: 1;
+}
+
+#app .orbit-direction {
+  fill: var(--acw-text-muted);
+  font-size: 12px;
+}
+
+#app .orbit-note {
+  max-width: 40rem;
+  margin: 0.25em auto 1em;
+  font-size: 0.75em;
+  color: var(--acw-text-muted);
+  text-align: center;
+}
+
+#app .solar-system-table tbody tr {
+  cursor: pointer;
+}
+
+#app .solar-system-table tr.is-current td {
+  font-weight: 700;
+  color: var(--acw-accent-2);
 }
 
 /* Nakshatras: the Moon's row is the birth star. */

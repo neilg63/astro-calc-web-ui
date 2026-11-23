@@ -74,7 +74,7 @@ function submit() {
         <PointsList v-if="(res as TransposedPositionsResult).points" :points="(res as TransposedPositionsResult).points!" title="Points at the moment" />
         <PointsList v-if="(res as TransposedPositionsResult).historic_points" :points="(res as TransposedPositionsResult).historic_points!" title="Historic points" />
         <b-table :data="rows" striped narrowed scrollable>
-          <b-table-column field="source" label="Source body" v-slot="props"><BodyKey :value="props.row.source" named /></b-table-column>
+          <b-table-column field="source" label="Source body" v-slot="props"><BodyKey :value="props.row.source" /></b-table-column>
           <b-table-column field="lng" label="Longitude" v-slot="props"><DegreeValue :value="props.row.lng" /></b-table-column>
           <b-table-column field="lat" label="Latitude" numeric v-slot="props">{{ round(props.row.lat) }}</b-table-column>
           <b-table-column field="ras" label="Right asc." numeric v-slot="props">{{ round(props.row.ras) }}</b-table-column>

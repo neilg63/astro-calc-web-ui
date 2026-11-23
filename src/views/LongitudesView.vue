@@ -72,7 +72,7 @@ function submit() {
           <template v-else>tropical</template>
         </p>
         <b-table :data="rows" striped narrowed>
-          <b-table-column field="key" label="Body" v-slot="props"><BodyKey :value="props.row.key" named /></b-table-column>
+          <b-table-column field="key" label="Body" v-slot="props"><BodyKey :value="props.row.key" /></b-table-column>
           <b-table-column field="lng" label="Longitude" v-slot="props"><DegreeValue :value="props.row.lng" /></b-table-column>
           <b-table-column field="lng" label="Decimal" numeric v-slot="props">{{ round(props.row.lng, 6) }}</b-table-column>
         </b-table>

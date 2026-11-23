@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
-import { bodySymbol } from '../lib/bodies'
+import { bodyFullName, bodySymbol } from '../lib/bodies'
 import { useReferenceStore } from '../stores/reference'
 
 /**
  * A body or point by its API abbreviation, with its Unicode symbol first (`♃ ju`) and its
- * full English name as the tooltip. With `named`, the name is shown too: `♃ Jupiter (ju)`.
+ * full name as the tooltip (`Ketu / South Node` for `ke`). This is the form for table cells.
+ * With `named`, for running text, the name is shown too: `♃ Jupiter (ju)`.
  */
 const props = defineProps<{ value: string; named?: boolean }>()
 
@@ -13,7 +14,7 @@ const reference = useReferenceStore()
 onMounted(() => reference.loadAll())
 
 const symbol = computed(() => bodySymbol(props.value))
-const name = computed(() => reference.bodies.find((b) => b.key === props.value)?.name ?? '')
+const name = computed(() => bodyFullName(props.value, reference.bodies.find((b) => b.key === props.value)?.name ?? ''))
 </script>
 
 <template>

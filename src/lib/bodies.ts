@@ -46,3 +46,13 @@ export function withBodySymbol(key: string, label: string = key): string {
   const symbol = bodySymbol(key)
   return symbol ? `${symbol} ${label}` : label
 }
+
+/** Names astrologers use for bodies the API lists under another name. */
+export const BODY_ALIASES: Record<string, string> = { ra: 'Rahu', ke: 'Ketu' }
+
+/** A body's full name, with the astrologers' name first where it has one: `Ketu / South Node`. */
+export function bodyFullName(key: string, name: string): string {
+  const alias = BODY_ALIASES[key]
+  if (!alias) return name
+  return name ? `${alias} / ${name}` : alias
+}

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { withBodySymbol } from '../lib/bodies'
+import { BODY_ALIASES as ALIASES, withBodySymbol } from '../lib/bodies'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useReferenceStore } from '../stores/reference'
 import { hiddenBodies, perspective, perspectiveBodies, perspectiveNote } from '../lib/perspectives'
@@ -15,9 +15,6 @@ const emit = defineEmits<{ 'update:modelValue': [string[]] }>()
 const reference = useReferenceStore()
 
 onMounted(() => reference.loadAll())
-
-/** Names astrologers use for bodies the API lists under another name. */
-const ALIASES: Record<string, string> = { ra: 'Rahu', ke: 'Ketu' }
 
 /**
  * The bodies on offer: those the perspective can show. The API lists the Earth as unavailable,

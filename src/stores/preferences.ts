@@ -90,6 +90,8 @@ export interface PreferencesState {
   houseSystems: string[]
   aspects: AspectDef[]
   defaultOrb: number
+  /** Whether a page recalculates by itself, a moment after its form was last changed. */
+  autoRecalc: boolean
 }
 
 /** 2: the default perspective became topocentric. */
@@ -125,6 +127,7 @@ function defaults(): PreferencesState {
       { angle: 60, orb: 6 },
     ],
     defaultOrb: 8,
+    autoRecalc: false,
   }
 }
 

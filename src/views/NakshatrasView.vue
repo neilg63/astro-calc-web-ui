@@ -25,9 +25,12 @@ onMounted(() => reference.loadAll())
 /** The API's own default for nakshatras, used until another ayanamsha is chosen. */
 const DEFAULT_AYANAMSHA = 'tc'
 
-// The Moon alone gives the birth star. The page keeps its own ayanamsha: a nakshatra always
-// has one, whatever zodiac the other pages are set to.
-const form = reactive({ bodies: ['mo'], aya: prefs.ayanamshas[0] ?? DEFAULT_AYANAMSHA })
+/** The nine grahas, in their traditional order: each has a nakshatra, the Moon's being the birth star. */
+const GRAHAS = ['su', 'mo', 'ma', 'me', 'ju', 've', 'sa', 'ra', 'ke']
+
+// The page keeps its own ayanamsha: a nakshatra always has one, whatever zodiac the other
+// pages are set to.
+const form = reactive({ bodies: [...GRAHAS], aya: prefs.ayanamshas[0] ?? DEFAULT_AYANAMSHA })
 
 interface NakshatraResult {
   date: Moment
@@ -66,7 +69,7 @@ function submit() {
 
 <template>
   <section class="view-page view-nakshatras">
-    <p class="view-subtitle subtitle">The 27 lunar mansions: 13°20′ divisions of the sidereal zodiac, each of four padas. The Moon's nakshatra at birth is the birth star.</p>
+    <p class="view-subtitle subtitle">The 27 lunar mansions: 13°20′ divisions of the sidereal zodiac, each of four padas. Every graha has one; the Moon's at birth is the birth star.</p>
 
     <div class="view-form box horizontal-form">
       <BodySelect v-model="form.bodies" perspective="geo" />
@@ -91,14 +94,14 @@ function submit() {
           geocentric · sidereal ({{ ayanamshaLabel((res as NakshatraResult).ayanamsha.name) }}, {{ round((res as NakshatraResult).ayanamsha.value, 4) }}°)
         </p>
         <b-table class="nakshatras-table" :data="rows" :row-class="rowClass" striped narrowed>
-          <b-table-column field="key" label="Body" v-slot="props"><BodyKey :value="props.row.key" named /></b-table-column>
+          <b-table-column field="key" label="Body" v-slot="props"><BodyKey :value="props.row.key" /></b-table-column>
           <b-table-column field="lng" label="Longitude" v-slot="props">
             <DegreeValue :value="props.row.lng" :ayanamsha="ayanamshaLabel((res as NakshatraResult).ayanamsha.name)" />
           </b-table-column>
           <b-table-column field="num" label="#" numeric v-slot="props">{{ props.row.num }}</b-table-column>
           <b-table-column field="name" label="Nakshatra" v-slot="props"><span class="nakshatra-name">{{ props.row.name }}</span></b-table-column>
           <b-table-column field="pada" label="Pada" numeric v-slot="props">{{ props.row.pada }}</b-table-column>
-          <b-table-column field="lord" label="Lord" v-slot="props"><BodyKey :value="props.row.lord" named /></b-table-column>
+          <b-table-column field="lord" label="Lord" v-slot="props"><BodyKey :value="props.row.lord" /></b-table-column>
           <b-table-column field="degrees" label="Within" numeric v-slot="props">
             <span class="nakshatra-degrees" :title="`${round(props.row.degrees, 4)}° of ${formatFullDms((res as NakshatraResult).span)}`">{{ formatFullDms(props.row.degrees) }}</span>
           </b-table-column>

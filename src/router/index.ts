@@ -10,6 +10,7 @@ const routes = [
   { path: '/extended-positions', name: 'extended-positions', component: () => import('../views/ExtendedPositionsView.vue'), meta: { label: 'Extended Positions' } },
   { path: '/longitude-progress', name: 'longitude-progress', component: () => import('../views/LongitudeProgressView.vue'), meta: { label: 'Longitude Progress' } },
   { path: '/progress', name: 'progress', component: () => import('../views/ProgressView.vue'), meta: { label: 'Graha Progress' } },
+  { path: '/solar-system', name: 'solar-system', component: () => import('../views/SolarSystemView.vue'), meta: { label: 'Solar System' } },
   { path: '/ascendant', name: 'ascendant', component: () => import('../views/AscendantView.vue'), meta: { label: 'Ascendant' } },
   { path: '/ascendant-progress', name: 'ascendant-progress', component: () => import('../views/AscendantProgressView.vue'), meta: { label: 'Ascendant Progress' } },
   // The Angles page showed the same points as Ascendant.
