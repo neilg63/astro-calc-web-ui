@@ -59,11 +59,19 @@
  *                   .orbit-chart (the Solar System diagram, an SVG; .shows-inner, .shows-core or .shows-all),
  *                   .orbit-body and .orbit-body-<body key> (a planet's group, which sets its colour), .orbit-guide
  *                   (its dashed mean-distance circle), .orbit-track (the span's travel), .orbit-dot, .orbit-label
- *                   (.orbit-label-symbol, the large symbol, and .orbit-label-name),
+ *                   (.orbit-label-symbol, the large symbol, .orbit-label-name and .orbit-label-geo, the longitude seen from the Earth),
+ *                   .orbit-sight (a line of sight from the Earth, in the colour of the body it reaches; .orbit-body-su is the Sun's),
+ *                   .orbit-sight-toggle (the checkbox that draws them),
  *                   .orbit-moon, .orbit-sun, .orbit-axis, .orbit-direction (the 0°/90°/180°/270° labels),
  *                   .orbit-controls (.orbit-range, the Inner / Core / All buttons, each an .orbit-range-option with a tooltip, .orbit-play, .orbit-day-slider, .orbit-day), .orbit-note,
  *                   .solar-system-tabs (the Orbits tab, then one per body), .solar-system-table (a body's table;
- *                   tr.is-current is the day on the diagram);
+ *                   tr.is-current is the day on the diagram), .helio-geo-value (a cell of it: the heliocentric
+ *                   value, with the geocentric one in its tooltip, which takes the page's background;
+ *                   .helio-geo-lines holds that tooltip's lines, each a .helio-geo-line (.is-heliocentric or
+ *                   .is-geocentric) of .helio-geo-view (the perspective: inline-block, 7em wide, left-aligned), .helio-geo-pipe (a
+ *                   separator) and .helio-geo-part cells, right-aligned: .helio-geo-sign (by sign),
+ *                   .helio-geo-dms (round the circle), .helio-geo-decimal, .helio-geo-number (any other value)
+ *                   and .helio-geo-zodiac (the word "tropical", left-aligned); .is-helio-only where there is no tooltip);
  *                   .nakshatras-table (the Nakshatras listing: each row is tr.nakshatra-1 to tr.nakshatra-27,
  *                   tr.pada-1 to tr.pada-4 and tr.lord-<body key>; tr.is-moon, the birth star's row, is bold),
  *                   .nakshatra-name, .nakshatra-degrees (cells of that table),
@@ -708,6 +716,25 @@
 #app .orbit-body-ur { --orbit-colour: #2fa9b6; }
 #app .orbit-body-ne { --orbit-colour: #5a6fe0; }
 #app .orbit-body-pl { --orbit-colour: #a06bc4; }
+#app .orbit-body-su { --orbit-colour: #c98a0c; }
+
+/* A line of sight from the Earth to a body, under the dots. */
+#app .orbit-sight {
+  stroke: var(--orbit-colour);
+  stroke-width: 1;
+  opacity: 0.6;
+}
+
+#app .orbit-sight-toggle {
+  margin: 0;
+}
+
+/* The longitude a body is seen at from the Earth, after its name. */
+#app .orbit-label-geo {
+  font-size: 11px;
+  fill: var(--acw-text-muted);
+  font-variant-numeric: tabular-nums;
+}
 
 #app .orbit-guide {
   fill: none;
@@ -783,6 +810,62 @@
 #app .solar-system-table tr.is-current td {
   font-weight: 700;
   color: var(--acw-accent-2);
+}
+
+/*
+ * The tooltip of a heliocentric value: the page's own background and text colour, light or
+ * dark, with a border to set it off. One line for each perspective.
+ */
+#app .helio-geo-value {
+  --bulma-tooltip-background-color: var(--acw-bg);
+  --bulma-tooltip-color: var(--bulma-body-color);
+}
+
+#app .helio-geo-value .tooltip-content {
+  border: 1px solid var(--acw-border);
+  font-weight: 400;
+  text-align: left;
+}
+
+/* The lines are rows of a table, so that each part is as wide as its counterpart on the other line. */
+#app .helio-geo-lines {
+  display: table;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+#app .helio-geo-line {
+  display: table-row;
+}
+
+#app .helio-geo-line > span {
+  display: table-cell;
+  padding: 0 0.25em;
+}
+
+/* Labels to the left, degrees to the right. */
+#app .helio-geo-view,
+#app .helio-geo-zodiac {
+  text-align: left;
+  color: var(--acw-text-muted);
+}
+
+/* The perspective's name: a fixed width, wide enough for the longest, "Heliocentric". */
+#app .helio-geo-line > .helio-geo-view {
+  display: inline-block;
+  width: 7em;
+  white-space: nowrap;
+}
+
+#app .helio-geo-sign,
+#app .helio-geo-dms,
+#app .helio-geo-decimal,
+#app .helio-geo-number {
+  text-align: right;
+}
+
+#app .helio-geo-pipe {
+  color: var(--acw-border);
 }
 
 /* Nakshatras: the Moon's row is the birth star. */

@@ -4,28 +4,27 @@ import { useEndpoint } from '../api/useEndpoint'
 import { momentParams, useMomentForm } from '../lib/queryForms'
 import { bodySymbol, withBodySymbol } from '../lib/bodies'
 import { useReferenceStore } from '../stores/reference'
-import { round } from '../lib/format'
+import { signPosition } from '../lib/degrees'
 import MomentFields from '../components/MomentFields.vue'
 import RunButton from '../components/RunButton.vue'
 import ResultPanel from '../components/ResultPanel.vue'
-import DegreeValue from '../components/DegreeValue.vue'
+import HelioGeoValue from '../components/HelioGeoValue.vue'
 import UtcTime from '../components/UtcTime.vue'
 
 /** The nine planets outwards from the Sun, then the Earth's Moon. The selection is fixed. */
 const PLANETS = ['me', 've', 'ea', 'ma', 'ju', 'sa', 'ur', 'ne', 'pl']
-const BODIES = [...PLANETS, 'mo']
+/** The Sun is fetched for its sight line from the Earth only: it has no heliocentric position, and no table. */
+const BODIES = [...PLANETS, 'mo', 'su']
 /** The span is chosen in whole years, with one position a day. */
 const MIN_YEARS = 1
 const MAX_YEARS = 10
-const DAYS_PER_YEAR = 365.25
 
 const moment = useMomentForm()
 const form = reactive({ years: 2 })
 const reference = useReferenceStore()
 onMounted(() => reference.loadAll())
 
-interface HelioItem {
-  jd: number
+interface Coords {
   lng: number
   lat: number
   dist: number
@@ -34,21 +33,37 @@ interface HelioItem {
   dist_speed: number
 }
 
+/**
+ * One day of a body, from the Sun and from the centre of the Earth. A body that one of them
+ * cannot see has no block for it: the Earth has no `geo`, the Sun no `helio`.
+ */
+interface DayItem {
+  jd: number
+  helio?: Coords
+  geo?: Coords
+}
+
+/** A day of a body that orbits the Sun. */
+type HelioItem = DayItem & { helio: Coords }
+
 interface HelioResult {
   ps: string
   span: number
-  bodies: { key: string; items: HelioItem[] }[]
+  bodies: { key: string; items: DayItem[] }[]
 }
 
 const { data, error, loading, run, lastUrl } = useEndpoint<HelioResult>('/progress')
 
-// Always from the Sun, on the ecliptic and tropical: no place, perspective or ayanamsha is
-// sent, and the ayanamsha preference of the other pages is left as it is.
+// Always from the Sun and from the Earth together (`hg`), on the ecliptic and tropical: no
+// place or ayanamsha is sent, and the ayanamsha preference of the other pages is left as it is.
 function submit() {
-  run({ bodies: BODIES, ...momentParams(moment), ps: 'helio', cs: 'ecl', days: Math.round(form.years * DAYS_PER_YEAR), pd: 1 })
+  run({ bodies: BODIES, ...momentParams(moment), ps: 'hg', cs: 'ecl', years: form.years, pd: 1 })
 }
 
-const series = computed(() => new Map((data.value?.bodies ?? []).map((b) => [b.key, b.items])))
+const allSeries = computed(() => new Map((data.value?.bodies ?? []).map((b) => [b.key, b.items])))
+/** The bodies with a heliocentric position, which are those drawn and tabled: every one but the Sun. */
+const helioBodies = computed(() => (data.value?.bodies ?? []).filter((b) => b.items[0]?.helio) as { key: string; items: HelioItem[] }[])
+const series = computed(() => new Map(helioBodies.value.map((b) => [b.key, b.items])))
 const count = computed(() => series.value.get('ea')?.length ?? 0)
 
 /** The day shown on the chart: an index into the series. */
@@ -116,7 +131,7 @@ const R = 300
 const INNER_AU = 1.75
 
 /** The greatest distance of any planet shown, over the span, in AU. */
-const reach = computed(() => Math.max(1, ...shownPlanets.value.flatMap((key) => (series.value.get(key) ?? []).map((item) => item.dist))))
+const reach = computed(() => Math.max(1, ...shownPlanets.value.flatMap((key) => (series.value.get(key) ?? []).map((item) => item.helio.dist))))
 
 /** A distance from the Sun in AU as a radius on the chart. */
 function radius(dist: number): number {
@@ -126,8 +141,8 @@ function radius(dist: number): number {
 }
 
 function point(item: HelioItem): { x: number; y: number } {
-  const r = radius(item.dist)
-  const a = (item.lng * Math.PI) / 180
+  const r = radius(item.helio.dist)
+  const a = (item.helio.lng * Math.PI) / 180
   return { x: r * Math.cos(a), y: -r * Math.sin(a) }
 }
 
@@ -145,7 +160,7 @@ const tracks = computed<Track[]>(() => {
   for (const key of shownPlanets.value) {
     const items = series.value.get(key)
     if (!items?.length) continue
-    const mean = radius(items.reduce((sum, item) => sum + item.dist, 0) / items.length)
+    const mean = radius(items.reduce((sum, item) => sum + item.helio.dist, 0) / items.length)
     const points = items
       .map((item) => {
         const p = point(item)
@@ -157,10 +172,30 @@ const tracks = computed<Track[]>(() => {
   return out
 })
 
-/** A planet on the day shown, with its label: the symbol and the name. */
+/** Whether the lines of sight from the Earth are drawn, with each body's geocentric longitude. */
+const sightLines = ref(true)
+
+/** A geocentric longitude as a short label: degrees and minutes within the sign, e.g. `12° ♌︎ 34'`. */
+function signLabel(lng: number): string {
+  const p = signPosition(lng)
+  return `${p.deg}° ${p.signSymbol} ${p.min}'`
+}
+
+/** A body's geocentric longitude on the day shown, as a label; empty with the sight lines off, or for the Earth. */
+function geoLabel(key: string): string {
+  const geo = allSeries.value.get(key)?.[day.value]?.geo
+  return sightLines.value && geo ? signLabel(geo.lng) : ''
+}
+
+/**
+ * A planet on the day shown, with its label: the symbol, the name and, with the sight lines
+ * on, the longitude it is seen at from the Earth. The Sun is one of them then, for its label.
+ */
 interface Orbit {
   key: string
   name: string
+  /** The geocentric longitude, as a label; empty where none is shown. */
+  geo: string
   x: number
   y: number
   labelX: number
@@ -181,6 +216,8 @@ const overlaps = (a: Box, b: Box) => a.left < b.right && b.left < a.right && a.t
 const LABEL_HEIGHT = 20
 const LABEL_SYMBOL_WIDTH = 24
 const LABEL_LETTER_WIDTH = 7
+/** The room a label's geocentric longitude takes. */
+const LABEL_GEO_WIDTH = 66
 
 /**
  * The planets on the day shown. Each label goes beside its planet, on the side away from the
@@ -192,6 +229,8 @@ const orbits = computed<Orbit[]>(() => {
     const now = series.value.get(track.key)?.[day.value]
     return now ? [{ key: track.key, ...point(now) }] : []
   })
+  // The Sun takes a label only for its longitude from the Earth.
+  if (geoLabel('su')) found.unshift({ key: 'su', x: 0, y: 0 })
   const around = (x: number, y: number, half: number): Box => ({ left: x - half, right: x + half, top: y - half, bottom: y + half })
   const taken: Box[] = [around(0, 0, 9), ...found.map((p) => around(p.x, p.y, 6)), ...DIRECTIONS.map((d) => around(d.x, d.y - 4, 24))]
   const frame: Box = { left: -R - 58, right: R + 58, top: -R - 28, bottom: R + 28 }
@@ -199,7 +238,8 @@ const orbits = computed<Orbit[]>(() => {
   // The outermost planets are placed first: they have the most room, and their labels the least choice.
   const placed = new Map<string, Pick<Orbit, 'labelX' | 'labelY' | 'anchor'>>()
   for (const p of [...found].reverse()) {
-    const width = LABEL_SYMBOL_WIDTH + LABEL_LETTER_WIDTH * bodyName(p.key).length
+    const geo = geoLabel(p.key)
+    const width = LABEL_SYMBOL_WIDTH + LABEL_LETTER_WIDTH * bodyName(p.key).length + (geo ? LABEL_GEO_WIDTH : 0)
     const right = { labelX: p.x + 9, labelY: p.y, anchor: 'start' as const }
     const left = { labelX: p.x - 9, labelY: p.y, anchor: 'end' as const }
     const above = { labelX: p.x, labelY: p.y - 17, anchor: 'middle' as const }
@@ -218,7 +258,24 @@ const orbits = computed<Orbit[]>(() => {
     taken.push(boxOf(choice))
     placed.set(p.key, choice)
   }
-  return found.map((p) => ({ ...p, name: bodyName(p.key), ...placed.get(p.key)! }))
+  return found.map((p) => ({ ...p, name: bodyName(p.key), geo: geoLabel(p.key), ...placed.get(p.key)! }))
+})
+
+/**
+ * The lines of sight from the Earth to the Sun and to each planet shown, on the day shown.
+ * Each runs from the Earth's dot to the body's, so its direction on the chart is the true
+ * geocentric longitude only at true scale (Inner); the label always gives the true figure.
+ */
+const sights = computed(() => {
+  const earth = orbits.value.find((o) => o.key === 'ea')
+  if (!sightLines.value || !earth) return []
+  return orbits.value.filter((o) => o.geo).map((o) => ({ key: o.key, x1: earth.x, y1: earth.y, x2: o.x, y2: o.y }))
+})
+
+/** The Moon's hover text: with its geocentric longitude, since it is too close to the Earth for a line. */
+const moonTitle = computed(() => {
+  const geo = allSeries.value.get('mo')?.[day.value]?.geo
+  return `Moon${geo ? ` at ${signLabel(geo.lng)} from the Earth` : ''} (its distance from the Earth is not to scale)`
 })
 
 /**
@@ -231,8 +288,8 @@ const moon = computed(() => {
   const drawn = orbits.value.find((o) => o.key === 'ea')
   if (!chosenRange.value.moon || !earth || !mo || !drawn) return null
   const xy = (item: HelioItem) => {
-    const a = (item.lng * Math.PI) / 180
-    return { x: item.dist * Math.cos(a), y: item.dist * Math.sin(a) }
+    const a = (item.helio.lng * Math.PI) / 180
+    return { x: item.helio.dist * Math.cos(a), y: item.helio.dist * Math.sin(a) }
   }
   const e = xy(earth)
   const m = xy(mo)
@@ -257,12 +314,12 @@ function bodyName(key: string): string {
 }
 
 /** The row of the day on the diagram is marked in every body's table. */
-function rowClass(row: HelioItem): string {
+function rowClass(row: DayItem): string {
   return row.jd === dayJd.value ? 'is-current' : ''
 }
 
 /** A click on a row moves the diagram to that day. */
-function pickDay(row: HelioItem) {
+function pickDay(row: DayItem) {
   const index = (series.value.get('ea') ?? []).findIndex((item) => item.jd === row.jd)
   if (index < 0) return
   stop()
@@ -273,7 +330,7 @@ function pickDay(row: HelioItem) {
 <template>
   <section class="view-page view-solar-system">
     <p class="view-subtitle subtitle">
-      The planets and the Moon as they orbit the Sun: heliocentric positions on the tropical zodiac, one a day for up to ten years from the start date.
+      The planets and the Moon as they orbit the Sun, and where each is seen from the Earth: heliocentric and geocentric positions on the tropical zodiac, one a day for up to ten years from the start date.
     </p>
 
     <div class="view-form box horizontal-form">
@@ -286,7 +343,7 @@ function pickDay(row: HelioItem) {
 
     <ResultPanel :data="data" :error="error" :loading="loading" :last-url="lastUrl">
       <template #default>
-        <p class="result-summary">heliocentric · tropical · {{ count }} days</p>
+        <p class="result-summary">heliocentric and geocentric · tropical · {{ count }} days</p>
 
         <b-tabs v-model="activeTab" size="is-small" :animated="false" class="rise-sets-tabs solar-system-tabs">
           <b-tab-item label="Orbits" icon="orbit">
@@ -299,6 +356,7 @@ function pickDay(row: HelioItem) {
               <b-button class="orbit-play" size="is-small" :icon-left="playing ? 'pause' : 'play'" :aria-label="playing ? 'Pause' : 'Play the span'" @click="togglePlay" />
               <b-slider v-model="day" class="orbit-day-slider" size="is-small" :min="0" :max="Math.max(count - 1, 0)" :tooltip="false" rounded aria-label="Day shown" @dragstart="stop" />
               <span class="orbit-day"><UtcTime v-if="dayJd !== null" :value="dayJd" /></span>
+              <b-checkbox v-model="sightLines" class="orbit-sight-toggle" size="is-small">Sight lines</b-checkbox>
             </div>
 
             <svg class="orbit-chart" :class="`shows-${range}`" :viewBox="`${-R - 60} ${-R - 30} ${2 * R + 120} ${2 * R + 60}`" role="img" aria-label="The planets around the Sun on the day shown, seen from north of the ecliptic">
@@ -310,27 +368,31 @@ function pickDay(row: HelioItem) {
                 <circle class="orbit-guide" cx="0" cy="0" :r="t.mean" />
                 <polyline class="orbit-track" :points="t.points" />
               </g>
+              <line v-for="s in sights" :key="s.key" class="orbit-sight" :class="`orbit-body-${s.key}`" :x1="s.x1" :y1="s.y1" :x2="s.x2" :y2="s.y2" />
               <circle class="orbit-sun" cx="0" cy="0" r="6"><title>Sun</title></circle>
               <g v-for="o in orbits" :key="o.key" class="orbit-body" :class="`orbit-body-${o.key}`">
-                <circle class="orbit-dot" :cx="o.x" :cy="o.y" r="4.5"><title>{{ o.name }}</title></circle>
+                <circle v-if="o.key !== 'su'" class="orbit-dot" :cx="o.x" :cy="o.y" r="4.5"><title>{{ o.name }}</title></circle>
                 <text class="orbit-label" :x="o.labelX" :y="o.labelY" :text-anchor="o.anchor" dominant-baseline="central">
-                  <tspan class="orbit-label-symbol">{{ bodySymbol(o.key) }}</tspan><tspan class="orbit-label-name" dx="4">{{ o.name }}</tspan>
+                  <tspan class="orbit-label-symbol">{{ bodySymbol(o.key) }}</tspan><tspan class="orbit-label-name" dx="4">{{ o.name }}</tspan><tspan v-if="o.geo" class="orbit-label-geo" dx="5">{{ o.geo }}</tspan>
                 </text>
               </g>
-              <circle v-if="moon" class="orbit-dot orbit-moon" :cx="moon.x" :cy="moon.y" r="2"><title>Moon (its distance from the Earth is not to scale)</title></circle>
+              <circle v-if="moon" class="orbit-dot orbit-moon" :cx="moon.x" :cy="moon.y" r="2"><title>{{ moonTitle }}</title></circle>
             </svg>
             <p class="orbit-note">
               Seen from north of the ecliptic. The solid arcs are the travel over the span, the dashed circles each planet's mean distance. Inner is at true scale; in Core and All, distances are compressed so that every orbit fits.
               <template v-if="chosenRange.moon">The Moon is drawn beside the Earth in its true direction, but not at its true distance.</template>
+              <template v-if="sightLines">
+                The thin lines are the lines of sight from the Earth, each labelled with the geocentric longitude<template v-if="range !== 'inner'">; with distances compressed, a line's angle on the chart is not that longitude</template>.
+              </template>
             </p>
           </b-tab-item>
-          <b-tab-item v-for="body in (data as HelioResult).bodies" :key="body.key" :label="withBodySymbol(body.key, bodyName(body.key))">
+          <b-tab-item v-for="body in helioBodies" :key="body.key" :label="withBodySymbol(body.key, bodyName(body.key))">
             <b-table class="jd-table solar-system-table" :data="body.items" :row-class="rowClass" striped narrowed hoverable paginated per-page="100" @click="pickDay">
               <b-table-column field="jd" label="Date-time" v-slot="props"><UtcTime :value="props.row.jd" /></b-table-column>
-              <b-table-column field="lng" label="Longitude" v-slot="props"><DegreeValue :value="props.row.lng" :ayanamsha="null" /></b-table-column>
-              <b-table-column field="lat" label="Latitude" numeric v-slot="props">{{ round(props.row.lat, 4) }}°</b-table-column>
-              <b-table-column field="lng_speed" label="Longitude speed" numeric v-slot="props">{{ round(props.row.lng_speed, 4) }}</b-table-column>
-              <b-table-column field="dist" label="Distance (AU)" numeric v-slot="props">{{ round(props.row.dist, 6) }}</b-table-column>
+              <b-table-column field="helio.lng" label="Longitude" v-slot="props"><HelioGeoValue kind="longitude" :helio="props.row.helio.lng" :geo="props.row.geo?.lng" /></b-table-column>
+              <b-table-column field="helio.lat" label="Latitude" numeric v-slot="props"><HelioGeoValue kind="degrees" :helio="props.row.helio.lat" :geo="props.row.geo?.lat" /></b-table-column>
+              <b-table-column field="helio.lng_speed" label="Longitude speed" numeric v-slot="props"><HelioGeoValue :helio="props.row.helio.lng_speed" :geo="props.row.geo?.lng_speed" /></b-table-column>
+              <b-table-column field="helio.dist" label="Distance (AU)" numeric v-slot="props"><HelioGeoValue :helio="props.row.helio.dist" :geo="props.row.geo?.dist" :decimals="6" /></b-table-column>
             </b-table>
           </b-tab-item>
         </b-tabs>

@@ -16,7 +16,7 @@ import UtcTime from '../components/UtcTime.vue'
 import ResultPanel from '../components/ResultPanel.vue'
 import DegreeValue from '../components/DegreeValue.vue'
 import { round } from '../lib/format'
-import type { AyanamshaValue, GeoJson, Moment } from '../api/types'
+import type { AyanamshaValue, GeoJson } from '../api/types'
 
 const reference = useReferenceStore()
 const moment = useMomentForm()
@@ -33,15 +33,12 @@ interface ProgressItem {
   jd: number
   lng: number
   lng_speed: number
-  age?: number
-  date?: Moment
 }
 
 interface ProgressResult {
   date: unknown
   geo: GeoJson
   ps: string
-  progressed: boolean
   sidereal: boolean
   ayanamshas: AyanamshaValue[]
   bodies: { key: string; items: ProgressItem[] }[]
@@ -50,8 +47,6 @@ interface ProgressResult {
 /** One sample of the series: a moment, and each body's longitude and its speed. */
 interface Row {
   jd: number
-  age?: number
-  date?: Moment
   cells: Record<string, { lng: number; retrograde: boolean } | undefined>
 }
 
@@ -66,8 +61,6 @@ const rows = computed<Row[]>(() => {
   if (!first) return []
   return first.items.map((item, i) => ({
     jd: item.jd,
-    age: item.age,
-    date: item.date,
     cells: Object.fromEntries(
       bodies.map((b) => {
         const sample = b.items[i]
@@ -109,13 +102,13 @@ function submit() {
         <b-field label="Span unit" label-position="on-border">
           <b-select size="is-small" v-model="form.unit">
             <option value="days">Days</option>
-            <option value="years" title="Secondary progression: one day per year">Years</option>
+            <option value="years">Years</option>
           </b-select>
         </b-field>
         <b-field class="span-amount" :label="form.unit === 'days' ? 'Days' : 'Years'" :title="form.unit === 'days' ? 'Number of days' : 'Number of years'" label-position="on-border">
           <b-numberinput size="is-small" v-model="form.amount" :min="0" :controls="false" />
         </b-field>
-        <b-field class="span-per-unit" :label="form.unit === 'days' ? 'Per day' : 'Per year'" :title="form.unit === 'days' ? 'Records per day' : 'Records per year'" label-position="on-border">
+        <b-field class="span-per-unit" label="Per day" title="Records per day" label-position="on-border">
           <b-numberinput size="is-small" v-model="form.pd" :min="0.01" step="any" :controls="false" />
         </b-field>
       </b-field>
@@ -135,8 +128,6 @@ function submit() {
         </p>
         <b-table :data="rows" striped narrowed scrollable paginated per-page="100" class="jd-table longitude-progress-table">
           <b-table-column field="jd" label="Date-time" v-slot="props"><UtcTime :value="props.row.jd" /></b-table-column>
-          <b-table-column v-if="(res as ProgressResult).progressed" field="date" label="Life date" v-slot="props"><UtcTime :value="props.row.date" /></b-table-column>
-          <b-table-column v-if="(res as ProgressResult).progressed" field="age" label="Age" numeric v-slot="props">{{ round(props.row.age, 3) }}</b-table-column>
           <b-table-column v-for="key in columns" :key="key" :label="withBodySymbol(key, bodyName(key))" v-slot="props">
             <span v-if="props.row.cells[key]" :class="{ 'is-retrograde': props.row.cells[key].retrograde }" :title="props.row.cells[key].retrograde ? 'Retrograde' : undefined">
               <DegreeValue :value="props.row.cells[key].lng" /><template v-if="props.row.cells[key].retrograde"> ℞</template>

@@ -28,10 +28,14 @@ const form = reactive({ bodies: [...CORE_BODY_KEYS], speeds: false, paired: fals
 /** The fields of a body without its key. */
 type ViewBlock = Omit<ExtendedBodyPosition, 'key'>
 
-/** A body of a `ps=both` response: the same fields from the centre of the Earth and from the place. */
+/**
+ * A body of a `ps=both` response: the same fields from the centre of the Earth (`geo`, the
+ * perspective's short key; `geoc` from an older API) and from the place.
+ */
 interface PairedBody {
   key: string
-  geoc: ViewBlock
+  geo?: ViewBlock
+  geoc?: ViewBlock
   topo: ViewBlock
 }
 
@@ -70,7 +74,7 @@ const isPaired = computed(() => data.value?.ps === 'both')
 /** One row per body, or two in a paired result: geocentric first, topocentric under it. */
 const rows = computed<Row[]>(() =>
   (data.value?.bodies ?? []).flatMap((body): Row[] =>
-    'geoc' in body ? [{ key: body.key, view: 'geoc', ...body.geoc }, { key: body.key, view: 'topo', ...body.topo }] : [body],
+    'topo' in body ? [{ key: body.key, view: 'geoc', ...((body.geo ?? body.geoc) as ViewBlock) }, { key: body.key, view: 'topo', ...body.topo }] : [body],
   ),
 )
 
