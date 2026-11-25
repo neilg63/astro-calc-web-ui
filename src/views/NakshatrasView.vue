@@ -6,7 +6,7 @@ import { usePreferencesStore } from '../stores/preferences'
 import { useReferenceStore } from '../stores/reference'
 import { ayanamshaLabel } from '../lib/zodiac'
 import { formatFullDms } from '../lib/degrees'
-import { round } from '../lib/format'
+import { formatJdSpan, jdToUtc, round } from '../lib/format'
 import MomentFields from '../components/MomentFields.vue'
 import LocationFields from '../components/LocationFields.vue'
 import BodySelect from '../components/BodySelect.vue'
@@ -14,6 +14,7 @@ import BodyKey from '../components/BodyKey.vue'
 import DegreeValue from '../components/DegreeValue.vue'
 import RunButton from '../components/RunButton.vue'
 import ResultPanel from '../components/ResultPanel.vue'
+import UtcTime from '../components/UtcTime.vue'
 import type { AyanamshaValue, GeoJson, Moment, NakshatraEntry } from '../api/types'
 
 const prefs = usePreferencesStore()
@@ -57,6 +58,12 @@ function rowClass(row: NakshatraEntry): string {
   return `nakshatra-${row.num} pada-${row.pada} lord-${row.lord}${row.key === 'mo' ? ' is-moon' : ''}`
 }
 
+/** What a duration says on hover: the same in days, and the moment the body leaves the nakshatra. */
+function durationTooltip(row: NakshatraEntry): string {
+  if (row.start_jd == null || row.end_jd == null) return ''
+  return `${round(row.end_jd - row.start_jd, 3)} days · leaves ${jdToUtc(row.end_jd)} UTC`
+}
+
 function submit() {
   run({
     bodies: form.bodies,
@@ -69,7 +76,7 @@ function submit() {
 
 <template>
   <section class="view-page view-nakshatras">
-    <p class="view-subtitle subtitle">The 27 lunar mansions: 13°20′ divisions of the sidereal zodiac, each of four padas. Every graha has one; the Moon's at birth is the birth star.</p>
+    <p class="view-subtitle subtitle">The 27 lunar mansions: 13°20′ divisions of the sidereal zodiac, each of four padas. Every graha has one, with the time it entered and how long it stays; the Moon's at birth is the birth star.</p>
 
     <div class="view-form box horizontal-form">
       <BodySelect v-model="form.bodies" perspective="geo" />
@@ -89,6 +96,7 @@ function submit() {
       <template #default="{ data: res }">
         <p v-if="moon" class="nakshatra-moon mb-2">
           Moon in <strong>{{ moon.name }}</strong>, pada {{ moon.pada }} · lord <BodyKey :value="moon.lord" named />
+          <template v-if="moon.start_jd != null && moon.end_jd != null"> · entered <UtcTime :value="moon.start_jd" /> for {{ formatJdSpan(moon.start_jd, moon.end_jd) }}</template>
         </p>
         <p class="result-summary">
           geocentric · sidereal ({{ ayanamshaLabel((res as NakshatraResult).ayanamsha.name) }}, {{ round((res as NakshatraResult).ayanamsha.value, 4) }}°)
@@ -106,6 +114,16 @@ function submit() {
             <span class="nakshatra-degrees" :title="`${round(props.row.degrees, 4)}° of ${formatFullDms((res as NakshatraResult).span)}`">{{ formatFullDms(props.row.degrees) }}</span>
           </b-table-column>
           <b-table-column field="fraction" label="Elapsed" numeric v-slot="props">{{ round(props.row.fraction * 100, 2) }}%</b-table-column>
+          <b-table-column field="start_jd" label="Entered" v-slot="props">
+            <UtcTime v-if="props.row.start_jd != null" class="nakshatra-start" :value="props.row.start_jd" />
+            <span v-else class="nakshatra-start is-unknown">—</span>
+          </b-table-column>
+          <b-table-column field="end_jd" label="Duration" numeric v-slot="props">
+            <b-tooltip v-if="props.row.start_jd != null && props.row.end_jd != null" class="nakshatra-duration" :label="durationTooltip(props.row)" position="is-top" dashed>
+              {{ formatJdSpan(props.row.start_jd, props.row.end_jd) }}
+            </b-tooltip>
+            <span v-else class="nakshatra-duration is-unknown">—</span>
+          </b-table-column>
         </b-table>
       </template>
     </ResultPanel>

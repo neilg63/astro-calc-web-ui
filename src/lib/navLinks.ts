@@ -24,6 +24,7 @@ export const ENDPOINT_LINKS: NavLink[] = [
   { to: '/moon-phases', label: 'Moon Phases', icon: 'moon-waning-crescent', blurb: 'New, full and between' },
   { to: '/tithis', label: 'Tithis', icon: 'moon-waxing-gibbous', blurb: 'Lunar days and karanas' },
   { to: '/nakshatras', label: 'Nakshatras', icon: 'star-crescent', blurb: 'Lunar mansions and the birth star' },
+  { to: '/nakshatra-progress', label: 'Nakshatra Progress', icon: 'star-shooting', blurb: 'When each body enters each mansion' },
   { to: '/indian-day', label: 'Indian Day', icon: 'white-balance-sunny', blurb: 'Ghati / vighati units' },
   { to: '/pheno', label: 'Phenomena', icon: 'telescope', blurb: 'Phase, magnitude, size' },
   { to: '/aspects', label: 'Aspects', icon: 'vector-triangle', blurb: 'Angles between bodies' },

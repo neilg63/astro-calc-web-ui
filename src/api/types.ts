@@ -153,6 +153,25 @@ export interface NakshatraEntry {
   /** Degrees into the nakshatra, and the same as a part of the whole. */
   degrees: number
   fraction: number
+  /**
+   * The moments the body came into the nakshatra and leaves it, as Julian Days. Null where
+   * not found within the search; the ascendant has neither.
+   */
+  start_jd?: number | null
+  end_jd?: number | null
+}
+
+/** An item of `/nakshatras`: a nakshatra a body passes through, and the moment it enters. */
+export interface NakshatraStep {
+  /** 1 (Ashwini) to 27 (Revati). */
+  num: number
+  name: string
+  /** The ruling body's key, in Vimshottari order. */
+  lord: string
+  /** The moment the body enters it, as a Julian Day; null if not found for the one in force. */
+  start_jd: number | null
+  /** False where the body enters it moving backwards, at its end. */
+  direct: boolean | null
 }
 
 export interface PhenoEntry {

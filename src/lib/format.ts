@@ -26,6 +26,26 @@ export function round(value: number | null | undefined, places = 4): string {
   return value.toFixed(places)
 }
 
+/**
+ * A length of time in days as `hh:mm:ss`, rounded to the nearest second: `21:11:09`. From a
+ * day up, the whole days come first: `13d 04:25:41`. A negative span keeps its sign; `—`
+ * when there is none.
+ */
+export function formatDuration(days: number | null | undefined): string {
+  if (days === null || days === undefined || !Number.isFinite(days)) return '—'
+  const total = Math.round(Math.abs(days) * 86_400)
+  const pad = (n: number) => String(n).padStart(2, '0')
+  const sign = days < 0 && total > 0 ? '-' : ''
+  const wholeDays = Math.floor(total / 86_400)
+  const clock = `${pad(Math.floor((total % 86_400) / 3600))}:${pad(Math.floor((total % 3600) / 60))}:${pad(total % 60)}`
+  return `${sign}${wholeDays > 0 ? `${wholeDays}d ` : ''}${clock}`
+}
+
+/** The time between two Julian Days, as [`formatDuration`] gives it; `—` unless both are known. */
+export function formatJdSpan(start: number | null | undefined, end: number | null | undefined): string {
+  return start == null || end == null ? '—' : formatDuration(end - start)
+}
+
 export type JdDisplayMode = 'utc' | 'local' | 'jd'
 
 /**

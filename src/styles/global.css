@@ -74,8 +74,14 @@
  *                   and .helio-geo-zodiac (the word "tropical", left-aligned); .is-helio-only where there is no tooltip);
  *                   .nakshatras-table (the Nakshatras listing: each row is tr.nakshatra-1 to tr.nakshatra-27,
  *                   tr.pada-1 to tr.pada-4 and tr.lord-<body key>; tr.is-moon, the birth star's row, is bold),
- *                   .nakshatra-name, .nakshatra-degrees (cells of that table),
+ *                   .nakshatra-name, .nakshatra-degrees, .nakshatra-start and .nakshatra-duration (cells of that table:
+ *                   the last two are when the body entered the nakshatra and how long it stays, as days and hh:mm:ss;
+ *                   .is-unknown where there is no time),
  *                   .nakshatra-moon (the line above it: the Moon's nakshatra, pada and lord);
+ *                   .nakshatra-progress-tabs (Nakshatra Progress: one tab per body), .nakshatra-progress-table (a body's
+ *                   listing: rows are tr.nakshatra-N and tr.lord-<body key> too, tr.is-current in bold for the one in
+ *                   force and tr.is-retrograde in italics where the body came in backwards),
+ *                   .nakshatra-motion (.is-direct or .is-retrograde: the cell that says which);
  *                   Stations rows also carry the event type (tr.is-retro-start …), italic at a retrograde's start and end
  *   Form components .moment-fields, .moment-mode (the Now / Date-time / Julian Day selector), .location-fields, .location-latitude, .location-longitude (6em boxes),
  *                   .location-altitude, .view-fields,
@@ -866,6 +872,44 @@
 
 #app .helio-geo-pipe {
   color: var(--acw-border);
+}
+
+#app .nakshatra-duration {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/*
+ * A duration sits in the last column and its tooltip is far wider than it, so centred it
+ * would run off the right of the table. It ends at the duration's right edge instead.
+ */
+#app .nakshatra-duration.b-tooltip .tooltip-content {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+
+#app .nakshatra-duration.b-tooltip .tooltip-content::before {
+  left: auto;
+  right: 1.5rem;
+  transform: none;
+}
+
+/* Nakshatra Progress: the nakshatra in force, and those a body backed into. */
+#app .nakshatra-progress-table tr.is-current td {
+  font-weight: 700;
+}
+
+#app .nakshatra-progress-table tr.is-retrograde td {
+  font-style: italic;
+}
+
+#app .nakshatra-motion.is-retrograde {
+  color: var(--acw-accent);
+}
+
+#app .nakshatra-motion.is-direct {
+  color: var(--acw-text-muted);
 }
 
 /* Nakshatras: the Moon's row is the birth star. */
