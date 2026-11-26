@@ -85,7 +85,7 @@ function submit() {
 
 <template>
   <section class="view-page view-rise-sets">
-    <p class="view-subtitle subtitle">Rise, set and meridian transits for each local day, with the altitude range. All times are UTC.</p>
+    <p class="view-subtitle subtitle">Rise, set and meridian transits for each local day, with the altitude range.</p>
 
     <div class="view-form box horizontal-form">
       <BodySelect v-model="form.bodies" />

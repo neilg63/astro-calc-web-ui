@@ -6,7 +6,8 @@ import { usePreferencesStore } from '../stores/preferences'
 import { useReferenceStore } from '../stores/reference'
 import { ayanamshaLabel } from '../lib/zodiac'
 import { formatFullDms } from '../lib/degrees'
-import { formatJdSpan, jdToUtc, round } from '../lib/format'
+import { formatJd, formatJdSpan, formatPercent, round } from '../lib/format'
+import { useTimeBasis } from '../lib/timeBasis'
 import MomentFields from '../components/MomentFields.vue'
 import LocationFields from '../components/LocationFields.vue'
 import BodySelect from '../components/BodySelect.vue'
@@ -58,10 +59,17 @@ function rowClass(row: NakshatraEntry): string {
   return `nakshatra-${row.num} pada-${row.pada} lord-${row.lord}${row.key === 'mo' ? ' is-moon' : ''}`
 }
 
-/** What a duration says on hover: the same in days, and the moment the body leaves the nakshatra. */
+const basis = useTimeBasis()
+
+/**
+ * What a duration says on hover: the same in days, and the moment the body leaves the
+ * nakshatra, in the times the table shows (UTC, local or Julian Day).
+ */
 function durationTooltip(row: NakshatraEntry): string {
   if (row.start_jd == null || row.end_jd == null) return ''
-  return `${round(row.end_jd - row.start_jd, 3)} days · leaves ${jdToUtc(row.end_jd)} UTC`
+  const mode = basis.mode.value
+  const zone = mode === 'jd' ? 'Julian Day (UT)' : mode === 'local' ? `local time, ${basis.offsetLabel.value}` : 'UTC'
+  return `${round(row.end_jd - row.start_jd, 3)} days · leaves ${formatJd(row.end_jd, mode, basis.offset.value ?? 0)} (${zone})`
 }
 
 function submit() {
@@ -113,7 +121,7 @@ function submit() {
           <b-table-column field="degrees" label="Within" numeric v-slot="props">
             <span class="nakshatra-degrees" :title="`${round(props.row.degrees, 4)}° of ${formatFullDms((res as NakshatraResult).span)}`">{{ formatFullDms(props.row.degrees) }}</span>
           </b-table-column>
-          <b-table-column field="fraction" label="Elapsed" numeric v-slot="props">{{ round(props.row.fraction * 100, 2) }}%</b-table-column>
+          <b-table-column field="fraction" label="Elapsed" numeric v-slot="props">{{ formatPercent(props.row.fraction) }}</b-table-column>
           <b-table-column field="start_jd" label="Entered" v-slot="props">
             <UtcTime v-if="props.row.start_jd != null" class="nakshatra-start" :value="props.row.start_jd" />
             <span v-else class="nakshatra-start is-unknown">—</span>

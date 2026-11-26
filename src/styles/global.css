@@ -72,6 +72,14 @@
  *                   separator) and .helio-geo-part cells, right-aligned: .helio-geo-sign (by sign),
  *                   .helio-geo-dms (round the circle), .helio-geo-decimal, .helio-geo-number (any other value)
  *                   and .helio-geo-zodiac (the word "tropical", left-aligned); .is-helio-only where there is no tooltip);
+ *                   .indian-day-unit (an Indian time unit's name in that table, with its other name and length in a tooltip),
+ *                   .indian-day-phase (the Sun or crescent before the ghati : vighati : lipta values, with Daytime or Night-time in its tooltip: .is-day or .is-night),
+ *                   .indian-day-unit-number (a unit's value, also classed by unit: .indian-day-ghati, .indian-day-vighati,
+ *                   .indian-day-lipta, .indian-day-muhurta, .indian-day-half-day-muhurta; inside it .indian-day-<unit>-whole and,
+ *                   for the lipta, .indian-day-lipta-decimals, the decimal places, set smaller),
+ *                   .indian-day-units (the row combining ghati, vighati and lipta: names in one cell, values in the next,
+ *                   each .indian-day-unit or .indian-day-unit-value with its own tooltip, parted by .indian-day-separator),
+ *                   .indian-day-duration (the Indian Day table's cell giving a length as days and hh:mm:ss);
  *                   .nakshatras-table (the Nakshatras listing: each row is tr.nakshatra-1 to tr.nakshatra-27,
  *                   tr.pada-1 to tr.pada-4 and tr.lord-<body key>; tr.is-moon, the birth star's row, is bold),
  *                   .nakshatra-name, .nakshatra-degrees, .nakshatra-start and .nakshatra-duration (cells of that table:
@@ -83,7 +91,7 @@
  *                   force and tr.is-retrograde in italics where the body came in backwards),
  *                   .nakshatra-motion (.is-direct or .is-retrograde: the cell that says which);
  *                   Stations rows also carry the event type (tr.is-retro-start …), italic at a retrograde's start and end
- *   Form components .moment-fields, .moment-mode (the Now / Date-time / Julian Day selector), .location-fields, .location-latitude, .location-longitude (6em boxes),
+ *   Form components .moment-fields, .moment-mode (the Now / Date-time / Julian Day selector), .moment-now (the present time beside "Now", a button that switches to Date-time; .moment-now-time, .moment-now-zone), .location-fields, .location-latitude, .location-longitude (6em boxes),
  *                   .location-altitude, .view-fields,
  *                   .place-search (place-name search; -name and -zone in its suggestions),
  *                   .local-time-field (the UTC date-time as clock time at the chosen place),
@@ -874,7 +882,8 @@
   color: var(--acw-border);
 }
 
-#app .nakshatra-duration {
+#app .nakshatra-duration,
+#app .indian-day-duration {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -1268,4 +1277,57 @@
 #app .paired-views-table .paired-view-label {
   font-size: 0.85em;
   white-space: nowrap;
+}
+
+#app .indian-day-unit {
+  border-bottom: 1px dotted var(--acw-border);
+  cursor: help;
+}
+
+#app .indian-day-unit-value {
+  cursor: help;
+  font-variant-numeric: tabular-nums;
+}
+
+#app .indian-day-separator {
+  margin: 0 0.35em;
+}
+
+#app .indian-day-phase {
+  display: inline-block;
+  margin-right: 0.35em;
+}
+
+/* Sits level with the selector's box, which has its on-border label's space above it. */
+#app .moment-now {
+  align-self: flex-start;
+  margin-top: 1.35rem;
+  background: none;
+  border: 0;
+  border-bottom: 1px dotted var(--acw-border);
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  padding: 0;
+  white-space: nowrap;
+}
+
+#app .moment-now:hover,
+#app .moment-now:focus-visible {
+  border-bottom-style: solid;
+}
+
+#app .moment-now-zone {
+  opacity: 0.7;
+}
+
+#app .indian-day-phase {
+  cursor: help;
+}
+
+#app .indian-day-lipta-decimals {
+  font-size: 0.75em;
+  opacity: 0.8;
 }

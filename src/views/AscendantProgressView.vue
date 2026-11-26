@@ -45,7 +45,7 @@ function submit() {
 
 <template>
   <section class="view-page view-ascendant-progress">
-    <p class="view-subtitle subtitle">The ascendant at even steps around a moment, with the chart points of the moment itself. All times are UTC.</p>
+    <p class="view-subtitle subtitle">The ascendant at even steps around a moment, with the chart points of the moment itself.</p>
 
     <div class="view-form box horizontal-form">
       <MomentFields :form="moment" />

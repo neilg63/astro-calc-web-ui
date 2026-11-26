@@ -27,6 +27,15 @@ export function round(value: number | null | undefined, places = 4): string {
 }
 
 /**
+ * A fraction on the API's 0.0 to 1.0 scale as a percentage: `0.1305` is `13.05%`. `—` when
+ * there is none.
+ */
+export function formatPercent(fraction: number | null | undefined, places = 2): string {
+  if (fraction === null || fraction === undefined || !Number.isFinite(fraction)) return '—'
+  return `${(fraction * 100).toFixed(places)}%`
+}
+
+/**
  * A length of time in days as `hh:mm:ss`, rounded to the nearest second: `21:11:09`. From a
  * day up, the whole days come first: `13d 04:25:41`. A negative span keeps its sign; `—`
  * when there is none.
@@ -79,4 +88,26 @@ export function coordColumns(cs: string | null | undefined): CoordColumns {
     default:
       return { first: 'lng', second: 'lat', firstLabel: 'Longitude', secondLabel: 'Latitude', ecliptic: true }
   }
+}
+
+/**
+ * A length of time in days spelt out in hours, minutes and seconds, leaving out any part
+ * that is zero: `48 minutes`, `24 minutes 2 seconds`, `24 seconds`, `0.4 seconds`. Seconds
+ * are whole from ten up and to one decimal below that. With `short`, the units are letters:
+ * `48m`, `23m 59s`, `24s`, `0.4s`. `—` when there is none.
+ */
+export function formatDurationWords(days: number | null | undefined, short = false): string {
+  if (days === null || days === undefined || !Number.isFinite(days)) return '—'
+  const exact = Math.abs(days) * 86_400
+  const total = exact < 10 ? Math.round(exact * 10) / 10 : Math.round(exact)
+  const hours = Math.floor(total / 3600)
+  const minutes = Math.floor((total % 3600) / 60)
+  const seconds = Math.round((total % 60) * 10) / 10
+  const part = (n: number, unit: string) => (short ? `${n}${unit[0]}` : `${n} ${unit}${n === 1 ? '' : 's'}`)
+  const parts = [
+    hours > 0 ? part(hours, 'hour') : '',
+    minutes > 0 ? part(minutes, 'minute') : '',
+    seconds > 0 || total === 0 ? part(seconds, 'second') : '',
+  ].filter(Boolean)
+  return `${days < 0 && total > 0 ? '-' : ''}${parts.join(' ')}`
 }

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onMounted, onUnmounted, ref } from 'vue'
 import { currentJulianDay, dateTimeStringToJul, julToIsoDateTime } from '../lib/julian-date'
 import type { MomentForm } from '../lib/queryForms'
 import { usePreferencesStore } from '../stores/preferences'
@@ -20,6 +21,15 @@ function changeMode(mode: MomentForm['mode']) {
   }
   form.mode = mode
 }
+
+/** The present time in UTC, to the second: what "Now" stands for, kept ticking while shown. */
+const utcNow = () => new Date().toISOString().slice(0, 19).replace('T', ' ')
+const now = ref(utcNow())
+let ticker: ReturnType<typeof setInterval> | undefined
+onMounted(() => {
+  ticker = setInterval(() => (now.value = utcNow()), 1000)
+})
+onUnmounted(() => clearInterval(ticker))
 </script>
 
 <template>
@@ -42,5 +52,8 @@ function changeMode(mode: MomentForm['mode']) {
     <b-field v-else-if="form.mode === 'jd'" label="Julian Day (UT)" label-position="on-border">
       <b-numberinput size="is-small" v-model="form.jd" step="any" :controls="false" />
     </b-field>
+    <button v-else type="button" class="moment-now" title="Click to edit this date and time" @click="changeMode('dt')">
+      <span class="moment-now-time">{{ now }}</span> <span class="moment-now-zone">UTC</span>
+    </button>
   </b-field>
 </template>

@@ -70,7 +70,7 @@ function submit() {
 <template>
   <section class="view-page view-transposed-transits">
     <p class="view-subtitle subtitle">
-      Rise, set and meridian transits of the points where bodies stood at a historic moment, for each local day at another place. All times are UTC.
+      Rise, set and meridian transits of the points where bodies stood at a historic moment, for each local day at another place.
     </p>
 
     <div class="view-form box horizontal-form">
